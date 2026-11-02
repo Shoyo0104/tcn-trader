@@ -1,0 +1,530 @@
+<meta name="dash-one-writer">
+<style>
+  .tt { max-width: 1180px; margin-inline: auto; font-family: var(--font-anthropic-sans); color: var(--color-fg); }
+  .tt h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0 0 var(--cds-gap-xs); }
+  .tt h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: var(--cds-gap-xl) 0 var(--cds-gap-sm); }
+  .tt h3 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin: 0; }
+  .tt .lede { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-body); max-width: 70ch; }
+  .tt .lede .warn { color: var(--color-bad); }
+  .tt .note { margin: var(--cds-gap-xs) 0 var(--cds-gap-sm); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .tt .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)); gap: var(--cds-gap-md); margin-top: var(--cds-gap-lg); }
+  .tt .tile { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); }
+  .tt .tile .label { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .tt .tile .big { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; margin: var(--cds-gap-xs) 0; min-height: 1.3em; }
+  .tt .tile .sub { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+  .tt .tile .sub b { font-weight: 400; color: var(--color-fg); }
+  .tt .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); gap: var(--cds-gap-md); }
+  .tt .card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; }
+  .tt .card.wide { grid-column: 1 / -1; }
+  .tt .chart { position: relative; min-height: 300px; }
+  .tt .chart.short { min-height: 260px; }
+  .tt .legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm) var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: var(--cds-gap-xs) 0 var(--cds-gap-sm); }
+  .tt .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .tt .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .tt .sw.s0 { background: var(--tt-c0); } .tt .sw.s1 { background: var(--tt-c1); } .tt .sw.s2 { background: var(--tt-c2); } .tt .sw.s3 { background: var(--cds-chart-muted); }
+  .tt .sw.ref { background: none; border-top: 2px dashed var(--cds-chart-reference); height: 0; width: 14px; border-radius: 0; }
+  .tt .tablebox { overflow: auto; max-height: 28rem; }
+  .tt table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+  .tt th { text-align: left; font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); position: sticky; top: 0; background: var(--color-panel); white-space: nowrap; }
+  .tt td { padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); vertical-align: top; }
+  .tt td.num, .tt th.num { text-align: right; white-space: nowrap; }
+  .tt tr.hl td { font-weight: var(--cds-font-weight-medium); }
+  .tt td.done { color: var(--color-ok); white-space: nowrap; }
+  .tt td.todo { color: var(--color-fg-muted); white-space: nowrap; }
+  .tt td.repeat { color: transparent; }
+  .tt .good { color: var(--color-ok); } .tt .bad { color: var(--color-bad); } .tt .meh { color: var(--color-warn); }
+  .tt .tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); white-space: nowrap; z-index: 5; }
+  .tt .tip .t { color: var(--cds-text-secondary); margin-bottom: 2px; }
+  .tt .tip .r { display: flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+  .tt .tip .r b { font-weight: 400; margin-left: auto; padding-left: var(--cds-pad-sm); }
+  .tt .live { color: var(--color-fg-muted); font-size: var(--cds-font-size-body); margin: 0; }
+  .tt [data-dash-source-state=empty] { color: transparent; }
+  .tt [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+  .tt .failed { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: inherit; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .tt .failed::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+</style>
+
+<div class="tt">
+  <header id="top">
+    <h1>TCN Trader</h1>
+    <p class="lede">
+      <span data-say="awaiting">Waiting for the first real-data backtest. Results appear here as soon as a run finishes.</span>
+      <span data-say="edge" hidden>Latest backtest: the TCN beats the vol-scaled baseline after costs, and the bootstrap test says the edge looks real. Next proof: live paper trading.</span>
+      <span data-say="inconclusive" hidden>Latest backtest: the TCN's edge over the vol-scaled baseline is inconclusive. Not enough evidence yet to call it real or luck.</span>
+      <span data-say="luck" hidden>Latest backtest: the TCN's results are indistinguishable from luck compared with simply holding a vol-scaled position.</span>
+      <span data-say="placebo-fail" class="warn" hidden>Warning: the leakage check failed, so these results can't be trusted until it passes.</span>
+    </p>
+    <p class="note">Tested on real market data, on periods the model never trained on, after trading costs. <span data-say="period" hidden>Test period <b data-draw="period" data-source="status" data-field="test_period" data-row="0">—</b>, retrained <b data-draw="retrain" data-source="status" data-field="retrain" data-row="0">—</b>, run on <b data-draw="rundate" data-source="status" data-field="latest_run" data-row="0">—</b>.</span></p>
+
+    <div class="tiles" id="headline">
+      <div class="tile" id="tile-sharpe">
+        <div class="label">TCN Sharpe ratio</div>
+        <div class="big" data-draw="t-sharpe" data-source="status" data-field="tcn_sharpe" data-row="0">—</div>
+        <div class="sub">Buy &amp; hold <b data-draw="t-bh" data-source="status" data-field="bh_sharpe" data-row="0">—</b> · vol-scaled <b data-draw="t-vol" data-source="status" data-field="vol_sharpe" data-row="0">—</b></div>
+      </div>
+      <div class="tile" id="tile-luck">
+        <div class="label">Chance the edge is luck</div>
+        <div class="big" data-draw="t-luck" data-source="status" data-field="p_not_better" data-row="0">—</div>
+        <div class="sub">Below 5% looks real · above 20% is luck</div>
+      </div>
+      <div class="tile" id="tile-cagr">
+        <div class="label">TCN yearly return</div>
+        <div class="big" data-draw="t-cagr" data-source="status" data-field="tcn_cagr" data-row="0">—</div>
+        <div class="sub">Worst drawdown <b data-draw="t-dd" data-source="status" data-field="tcn_max_drawdown" data-row="0">—</b></div>
+      </div>
+      <div class="tile" id="tile-auc">
+        <div class="label">Prediction skill (AUC)</div>
+        <div class="big" data-draw="t-auc" data-source="status" data-field="tcn_auc" data-row="0">—</div>
+        <div class="sub">0.500 = coin flip</div>
+      </div>
+      <div class="tile" id="tile-placebo">
+        <div class="label">Leakage check</div>
+        <div class="big" data-draw="t-placebo" data-source="status" data-field="placebo_check" data-row="0">—</div>
+        <div class="sub">Placebo AUC <b data-draw="t-pauc" data-source="status" data-field="placebo_auc" data-row="0">—</b> · should be ≈ 0.500</div>
+      </div>
+      <div class="tile" id="tile-phase">
+        <div class="label">Phase 1 progress</div>
+        <div class="big"><span data-draw="t-done" data-source="phase1" data-field="done" data-row="0">—</span> / <span data-draw="t-total" data-source="phase1" data-field="total" data-row="0">—</span></div>
+        <div class="sub">Roadmap items done</div>
+      </div>
+    </div>
+  </header>
+
+  <section id="backtest">
+    <h2>Backtest</h2>
+    <div class="grid">
+      <div class="card wide" id="card-equity">
+        <h3>Growth of $1, after costs</h3>
+        <p class="note">Each strategy traded every day of the test period, equal weight across tickers. Log scale, so equal slopes mean equal % gains.</p>
+        <div class="legend"><span><i class="sw s0"></i>TCN + risk map</span><span><i class="sw s1"></i>Logistic + risk map</span><span><i class="sw s2"></i>Vol-scaled long</span><span><i class="sw s3"></i>Buy &amp; hold</span></div>
+        <p class="note" data-awaiting hidden>No backtest results yet.</p>
+        <div class="chart" data-draw="equity" data-source="equity"></div>
+      </div>
+
+      <div class="card" id="card-yearly">
+        <h3>Sharpe ratio by year</h3>
+        <p class="note">Does the edge hold up every year, or come from one lucky stretch?</p>
+        <div class="legend"><span><i class="sw s0"></i>TCN</span><span><i class="sw s1"></i>Logistic</span><span><i class="sw s2"></i>Vol-scaled</span><span><i class="sw s3"></i>Buy &amp; hold</span></div>
+        <p class="note" data-awaiting hidden>No backtest results yet.</p>
+        <div class="chart short" data-draw="yearly" data-source="yearly"></div>
+      </div>
+
+      <div class="card" id="card-calibration">
+        <h3>Are the probabilities honest?</h3>
+        <p class="note">Predicted chance of an up day vs. how often it actually went up, by decile. On the dashed line = honest.</p>
+        <div class="legend"><span><i class="sw s0"></i>TCN (calibrated)</span><span><i class="sw s1"></i>Logistic</span><span><i class="sw ref"></i>Perfectly calibrated</span></div>
+        <p class="note" data-awaiting hidden>No backtest results yet.</p>
+        <div class="chart short" data-draw="calibration" data-source="calibration"></div>
+      </div>
+
+      <div class="card wide" id="card-perf">
+        <h3>Strategy performance</h3>
+        <p class="note">Out-of-sample, after costs, latest real-data run. Sharpe = return per unit of risk (higher is better).</p>
+        <div class="tablebox">
+          <table data-source="perf_real" data-row-key="strategy">
+            <thead><tr>
+              <th data-field="strategy">Strategy</th>
+              <th class="num" data-field="cagr">Yearly return</th>
+              <th class="num" data-field="volatility">Volatility</th>
+              <th class="num" data-field="sharpe">Sharpe</th>
+              <th class="num" data-field="max_drawdown">Worst drawdown</th>
+              <th class="num" data-field="exposure">Avg exposure</th>
+              <th class="num" data-field="turnover">Turnover / yr</th>
+            </tr></thead>
+            <tbody data-draw="perf"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card wide" id="card-predq">
+        <h3>Prediction quality</h3>
+        <p class="note">AUC: 0.5 = coin flip. Brier and log loss: lower is better; beating "always up" is the bar.</p>
+        <div class="tablebox">
+          <table data-source="predq_real" data-row-key="model">
+            <thead><tr>
+              <th data-field="model">Model</th>
+              <th class="num" data-field="auc">AUC</th>
+              <th class="num" data-field="accuracy">Accuracy</th>
+              <th class="num" data-field="brier">Brier</th>
+              <th class="num" data-field="log_loss">Log loss</th>
+            </tr></thead>
+            <tbody data-draw="predq"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="paper">
+    <h2>Live paper trading</h2>
+    <div class="card">
+      <p class="live">Not started yet. Once the daily job is built (Phase 1), every prediction is logged before the market opens, scored the next day, and tracked here against buy &amp; hold. This is the real test.</p>
+    </div>
+  </section>
+
+  <section id="runs">
+    <h2>Run history</h2>
+    <div class="card">
+      <p class="note">Every backtest, real and placebo (shuffled labels: should show no edge).</p>
+      <div class="tablebox">
+        <table data-source="runs" data-row-key="run">
+          <thead><tr>
+            <th data-field="date">Date</th>
+            <th data-field="mode">Mode</th>
+            <th data-field="retrain">Retrain</th>
+            <th data-field="test_period">Test period</th>
+            <th class="num" data-field="tcn_sharpe">TCN Sharpe</th>
+            <th class="num" data-field="bh_sharpe">Buy &amp; hold Sharpe</th>
+            <th class="num" data-field="tcn_auc">TCN AUC</th>
+            <th class="num" data-field="p_not_better">Chance of luck</th>
+            <th data-field="verdict">Verdict</th>
+          </tr></thead>
+          <tbody data-draw="runs"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="roadmap">
+    <h2>Roadmap</h2>
+    <div class="card">
+      <p class="note">From ROADMAP.md in the repo. Each new feature has to beat the version without it, or it's dropped.</p>
+      <div class="tablebox">
+        <table data-source="roadmap" data-row-key="order">
+          <thead><tr>
+            <th data-field="phase">Phase</th>
+            <th data-field="item">Item</th>
+            <th data-field="status">Status</th>
+          </tr></thead>
+          <tbody data-draw="roadmap"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  // ---------- shared helpers (on window so every script can use them) ----------
+  window.tt = {
+    STRATS: ['TCN + risk map', 'Logistic + risk map', 'Vol-scaled long', 'Buy & hold'],
+    short: { 'TCN + risk map': 'TCN', 'Logistic + risk map': 'Logistic', 'Vol-scaled long': 'Vol-scaled', 'Buy & hold': 'Buy & hold' },
+    css(name) { return getComputedStyle(document.getElementById('dash-root')).getPropertyValue(name).trim(); },
+    color(s) {
+      const i = tt.STRATS.indexOf(s);
+      return i >= 0 && i < 3 ? dash.colors[i] : tt.css('--cds-chart-muted');
+    },
+    f2: d3.format('.2f'), f3: d3.format('.3f'), pct: d3.format('.1%'), pct0: d3.format('.0%'), f1: d3.format('.1f'),
+    row(id) { const d = dash.data(id); return d.status === 'ok' && d.data.length ? d.data[0] : null; },
+    rows(id) { const d = dash.data(id); return d.status === 'ok' ? d.data : []; },
+    failed(el, id) {
+      if (dash.data(id).status === 'error') { el.replaceChildren(Object.assign(document.createElement('div'), { className: 'failed', textContent: 'Failed to load' })); return true; }
+      return false;
+    },
+    tip(el) {
+      let t = el.querySelector(':scope > .tip');
+      if (!t) { t = document.createElement('div'); t.className = 'tip'; t.hidden = true; el.appendChild(t); }
+      return t;
+    },
+    placeTip(el, t, x, y) {
+      const w = t.offsetWidth, h = t.offsetHeight, W = el.clientWidth;
+      let left = x + 12; if (left + w > W) left = x - w - 12; if (left < 0) left = 0;
+      t.style.left = left + 'px'; t.style.top = Math.max(0, y - h - 8) + 'px';
+    },
+    tipRows(t, title, items) {
+      t.replaceChildren();
+      const head = document.createElement('div'); head.className = 't'; head.textContent = title; t.appendChild(head);
+      for (const it of items) {
+        const r = document.createElement('div'); r.className = 'r';
+        const sw = document.createElement('i'); sw.className = 'sw'; sw.style.background = it.color;
+        const n = document.createElement('span'); n.textContent = it.name;
+        const v = document.createElement('b'); v.textContent = it.value;
+        r.append(sw, n, v); t.appendChild(r);
+      }
+    },
+    axisStyle(g) {
+      g.attr('font-size', null).attr('font-family', null);
+      g.selectAll('text').attr('fill', tt.css('--color-fg-muted')).style('font-size', 'var(--cds-font-size-caption)');
+      g.selectAll('line').attr('stroke', tt.css('--cds-chart-axis'));
+      g.select('.domain').attr('stroke', tt.css('--cds-chart-axis'));
+    },
+  };
+  // Swatch colors for the legends follow dash.colors (set as CSS variables on the page wrapper).
+  for (const w of document.querySelectorAll('.tt')) {
+    w.style.setProperty('--tt-c0', dash.colors[0]); w.style.setProperty('--tt-c1', dash.colors[1]); w.style.setProperty('--tt-c2', dash.colors[2]);
+  }
+
+  // ---------- derived tables ----------
+  dash.calc('perf_real', {
+    inputs: ['perf'], title: 'Backtest performance (latest real run)',
+    description: 'Strategy performance rows of the latest real-data run (placebo rows left out).',
+    fn: (perf) => perf.filter((r) => r.mode === 'real').map(({ mode, ...r }) => r),
+  });
+  dash.calc('predq_real', {
+    inputs: ['predq'], title: 'Prediction quality (latest real run)',
+    description: 'Prediction-quality rows of the latest real-data run (placebo rows left out).',
+    fn: (predq) => predq.filter((r) => r.mode === 'real').map(({ mode, ...r }) => r),
+  });
+
+  dash.calc('phase1', {
+    inputs: ['roadmap'], title: 'Phase 1 progress',
+    description: 'Roadmap items in Phase 1 that are checked off, out of all Phase 1 items.',
+    fn: (roadmap) => {
+      const p1 = roadmap.filter((r) => String(r.phase).startsWith('Phase 1'));
+      return [{ done: p1.filter((r) => r.done === true || r.done === 'true').length, total: p1.length }];
+    },
+  });
+
+  // ---------- which sentences show ----------
+  dash.onData(() => {
+    const s = tt.row('status');
+    const say = (k, on) => { for (const el of document.querySelectorAll(`[data-say="${k}"]`)) el.hidden = !on; };
+    const v = s ? s.verdict : null;
+    say('awaiting', !s);
+    say('edge', v === 'looks like a real edge');
+    say('inconclusive', v === 'inconclusive');
+    say('luck', v === 'indistinguishable from luck');
+    say('placebo-fail', !!s && s.placebo_check === 'Failed');
+    say('period', !!s);
+    for (const el of document.querySelectorAll('[data-awaiting]')) el.hidden = !!s || dash.data('status').status !== 'ok';
+  });
+</script>
+
+<script>
+  // ---------- headline tiles ----------
+  const tile = (name, field, fmt, cls) => dash.draw(name, (el) => {
+    const s = tt.row('status');
+    el.classList.remove('good', 'bad', 'meh');
+    if (!s || s[field] == null) { el.textContent = '—'; return; }
+    el.textContent = fmt(s[field]);
+    const c = cls ? cls(s[field], s) : null; if (c) el.classList.add(c);
+  });
+  tile('t-sharpe', 'tcn_sharpe', tt.f2, (v, s) => (v > Math.max(s.vol_sharpe ?? -9, s.bh_sharpe ?? -9) ? 'good' : null));
+  tile('t-bh', 'bh_sharpe', tt.f2);
+  tile('t-vol', 'vol_sharpe', tt.f2);
+  tile('t-luck', 'p_not_better', tt.pct0, (v) => (v < 0.05 ? 'good' : v >= 0.2 ? 'bad' : 'meh'));
+  tile('t-cagr', 'tcn_cagr', tt.pct);
+  tile('t-dd', 'tcn_max_drawdown', tt.pct);
+  tile('t-auc', 'tcn_auc', tt.f3);
+  tile('t-placebo', 'placebo_check', (v) => v, (v) => (v === 'Passed' ? 'good' : v === 'Failed' ? 'bad' : null));
+  tile('t-pauc', 'placebo_auc', tt.f3);
+  tile('period', 'test_period', (v) => v.replace('->', '–'));
+  tile('retrain', 'retrain', (v) => v.toLowerCase());
+  tile('rundate', 'latest_run', (v) => d3.utcFormat('%b %-d, %Y')(new Date(v)));
+  for (const [name, field] of [['t-done', 'done'], ['t-total', 'total']]) {
+    dash.draw(name, (el) => { const p = tt.row('phase1'); el.textContent = p ? String(p[field]) : '—'; });
+  }
+</script>
+
+<script>
+  // ---------- equity curves ----------
+  dash.draw('equity', (el) => {
+    el.replaceChildren();
+    if (tt.failed(el, 'equity')) return;
+    const raw = tt.rows('equity');
+    if (!raw.length) return;
+    const parse = d3.utcParse('%Y-%m-%d');
+    const rows = raw.map((r) => ({ date: parse(r.date), strategy: r.strategy, value: +r.value }));
+    const series = tt.STRATS.slice().reverse().map((s) => ({ s, pts: rows.filter((r) => r.strategy === s) })).filter((x) => x.pts.length);
+    const dates = Array.from(new Set(rows.map((r) => +r.date))).sort((a, b) => a - b).map((t) => new Date(t));
+    const W = el.clientWidth, H = 300;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Growth of $1 by strategy');
+    const ext = d3.extent(rows, (r) => r.value);
+    const y = d3.scaleLog([Math.min(ext[0], 1) * 0.97, Math.max(ext[1], 1) * 1.03], [H - 28, 10]);
+    const fmtY = (v) => '$' + d3.format('.2f')(v);
+    const ticks = y.ticks(6).filter((t, i, a) => a.length <= 7 || i % 2 === 0);
+    // measure widest y label and end labels to set margins
+    const probe = svg.append('text').style('font-size', 'var(--cds-font-size-caption)');
+    const wOf = (s) => { probe.text(s); return probe.node().getComputedTextLength(); };
+    const ml = d3.max(ticks, (t) => wOf(fmtY(t))) + 10;
+    const last = series.map((x) => ({ s: x.s, v: x.pts[x.pts.length - 1].value }));
+    const mr = d3.max(last, (l) => wOf(`${tt.short[l.s]} ${l.v.toFixed(2)}x`)) + 14;
+    probe.remove();
+    const x = d3.scaleUtc(d3.extent(dates), [ml, W - mr]);
+    // grid + axes
+    svg.append('g').selectAll('line').data(ticks).join('line').attr('x1', ml).attr('x2', W - mr).attr('y1', y).attr('y2', y).attr('stroke', tt.css('--cds-chart-grid'));
+    svg.append('line').attr('x1', ml).attr('x2', W - mr).attr('y1', y(1)).attr('y2', y(1)).attr('stroke', tt.css('--cds-chart-reference')).attr('stroke-dasharray', '4 3');
+    const gy = svg.append('g').attr('transform', `translate(${ml},0)`).call(d3.axisLeft(y).tickValues(ticks).tickFormat(fmtY).tickSize(0).tickPadding(6));
+    gy.select('.domain').remove(); tt.axisStyle(gy);
+    const gx = svg.append('g').attr('transform', `translate(0,${H - 28})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - ml - mr) / 90))).tickSizeOuter(0));
+    tt.axisStyle(gx);
+    // lines
+    const line = d3.line().x((d) => x(d.date)).y((d) => y(d.value));
+    for (const sr of series) {
+      svg.append('path').datum(sr.pts).attr('fill', 'none').attr('stroke', tt.color(sr.s))
+        .attr('stroke-width', sr.s === 'TCN + risk map' ? 2.5 : 2).attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round').attr('d', line);
+    }
+    // end labels, nudged apart
+    const lab = last.map((l) => ({ ...l, y: y(l.v) })).sort((a, b) => a.y - b.y);
+    for (let i = 1; i < lab.length; i++) if (lab[i].y - lab[i - 1].y < 14) lab[i].y = lab[i - 1].y + 14;
+    svg.append('g').selectAll('text').data(lab).join('text').attr('x', W - mr + 6).attr('y', (d) => d.y).attr('dy', '0.32em')
+      .style('font-size', 'var(--cds-font-size-caption)').attr('fill', tt.css('--color-fg')).text((d) => `${tt.short[d.s]} ${d.v.toFixed(2)}x`);
+    // hover
+    const tip = tt.tip(el);
+    const rule = svg.append('line').attr('y1', 10).attr('y2', H - 28).attr('stroke', tt.css('--cds-chart-axis')).style('display', 'none');
+    const dots = svg.append('g');
+    const byDate = d3.group(rows, (r) => +r.date);
+    svg.append('rect').attr('x', ml).attr('y', 0).attr('width', W - ml - mr).attr('height', H - 28).attr('fill', 'transparent')
+      .on('pointermove', (ev) => {
+        const [mx] = d3.pointer(ev);
+        const d = dates[Math.max(0, Math.min(dates.length - 1, d3.bisectCenter(dates.map(Number), +x.invert(mx))))];
+        const pts = (byDate.get(+d) || []).slice().sort((a, b) => tt.STRATS.indexOf(a.strategy) - tt.STRATS.indexOf(b.strategy));
+        rule.style('display', null).attr('x1', x(d)).attr('x2', x(d));
+        dots.selectAll('circle').data(pts).join('circle').attr('cx', x(d)).attr('cy', (p) => y(p.value)).attr('r', 4).attr('fill', (p) => tt.color(p.strategy)).attr('stroke', tt.css('--color-panel')).attr('stroke-width', 2);
+        tt.tipRows(tip, d3.utcFormat('%b %-d, %Y')(d), pts.map((p) => ({ name: tt.short[p.strategy], color: tt.color(p.strategy), value: '$' + p.value.toFixed(3) })));
+        tip.hidden = false; tt.placeTip(el, tip, x(d) * el.clientWidth / W, y(pts[0]?.value ?? 1) * el.clientWidth / W);
+      })
+      .on('pointerleave', () => { tip.hidden = true; rule.style('display', 'none'); dots.selectAll('circle').remove(); });
+  });
+</script>
+
+<script>
+  // ---------- Sharpe by year (grouped bars) ----------
+  dash.draw('yearly', (el) => {
+    el.replaceChildren();
+    if (tt.failed(el, 'yearly')) return;
+    const rows = tt.rows('yearly').map((r) => ({ ...r, sharpe: +r.sharpe }));
+    if (!rows.length) return;
+    const years = Array.from(new Set(rows.map((r) => r.year))).sort();
+    const strats = tt.STRATS.filter((s) => rows.some((r) => r.strategy === s));
+    const W = el.clientWidth, H = 260;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Sharpe ratio by year');
+    const ext = d3.extent(rows, (r) => r.sharpe);
+    const y = d3.scaleLinear([Math.min(0, ext[0]), Math.max(0, ext[1])], [H - 26, 8]).nice();
+    const probe = svg.append('text').style('font-size', 'var(--cds-font-size-caption)');
+    const ml = d3.max(y.ticks(5), (t) => { probe.text(tt.f1(t)); return probe.node().getComputedTextLength(); }) + 10;
+    probe.remove();
+    const x0 = d3.scaleBand(years, [ml, W - 4]).paddingInner(0.25).paddingOuter(0.1);
+    const x1 = d3.scaleBand(strats, [0, x0.bandwidth()]).padding(0.12);
+    svg.append('g').selectAll('line').data(y.ticks(5)).join('line').attr('x1', ml).attr('x2', W - 4).attr('y1', y).attr('y2', y).attr('stroke', tt.css('--cds-chart-grid'));
+    svg.append('line').attr('x1', ml).attr('x2', W - 4).attr('y1', y(0)).attr('y2', y(0)).attr('stroke', tt.css('--cds-chart-axis'));
+    const gy = svg.append('g').attr('transform', `translate(${ml},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(tt.f1).tickSize(0).tickPadding(6));
+    gy.select('.domain').remove(); tt.axisStyle(gy);
+    const every = Math.ceil(years.length / Math.max(1, Math.floor((W - ml) / 44)));
+    const gx = svg.append('g').attr('transform', `translate(0,${H - 26})`).call(d3.axisBottom(x0).tickValues(years.filter((_, i) => i % every === 0)).tickSize(0).tickPadding(8));
+    gx.select('.domain').remove(); tt.axisStyle(gx);
+    const bw = Math.min(x1.bandwidth(), 32);
+    const tip = tt.tip(el);
+    svg.append('g').selectAll('rect').data(rows).join('rect')
+      .attr('x', (d) => x0(d.year) + x1(d.strategy) + (x1.bandwidth() - bw) / 2).attr('width', bw)
+      .attr('y', (d) => y(Math.max(0, d.sharpe))).attr('height', (d) => Math.max(1, Math.abs(y(d.sharpe) - y(0))))
+      .attr('rx', Math.min(2, bw / 2)).attr('fill', (d) => tt.color(d.strategy))
+      .on('pointerenter pointermove', (ev, d) => {
+        const all = rows.filter((r) => r.year === d.year).sort((a, b) => tt.STRATS.indexOf(a.strategy) - tt.STRATS.indexOf(b.strategy));
+        tt.tipRows(tip, d.year, all.map((r) => ({ name: tt.short[r.strategy], color: tt.color(r.strategy), value: tt.f2(r.sharpe) })));
+        tip.hidden = false; const [mx, my] = d3.pointer(ev, el); tt.placeTip(el, tip, mx, my);
+      })
+      .on('pointerleave', () => { tip.hidden = true; });
+  });
+</script>
+
+<script>
+  // ---------- calibration ----------
+  dash.draw('calibration', (el) => {
+    el.replaceChildren();
+    if (tt.failed(el, 'calibration')) return;
+    const rows = tt.rows('calibration').map((r) => ({ ...r, predicted: +r.predicted, actual: +r.actual }));
+    if (!rows.length) return;
+    const W = el.clientWidth, H = 260;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Calibration by decile');
+    const all = rows.flatMap((r) => [r.predicted, r.actual]);
+    const lo = Math.min(d3.min(all), 0.45) - 0.01, hi = Math.max(d3.max(all), 0.55) + 0.01;
+    const probe = svg.append('text').style('font-size', 'var(--cds-font-size-caption)');
+    const y = d3.scaleLinear([lo, hi], [H - 36, 8]);
+    const ml = d3.max(y.ticks(5), (t) => { probe.text(tt.pct0(t)); return probe.node().getComputedTextLength(); }) + 10;
+    probe.remove();
+    const x = d3.scaleLinear([lo, hi], [ml, W - 8]);
+    svg.append('g').selectAll('line').data(y.ticks(5)).join('line').attr('x1', ml).attr('x2', W - 8).attr('y1', y).attr('y2', y).attr('stroke', tt.css('--cds-chart-grid'));
+    svg.append('line').attr('x1', x(lo)).attr('y1', y(lo)).attr('x2', x(hi)).attr('y2', y(hi)).attr('stroke', tt.css('--cds-chart-reference')).attr('stroke-dasharray', '4 3');
+    const gy = svg.append('g').attr('transform', `translate(${ml},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(tt.pct0).tickSize(0).tickPadding(6));
+    gy.select('.domain').remove(); tt.axisStyle(gy);
+    const gx = svg.append('g').attr('transform', `translate(0,${H - 36})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - ml) / 60))).tickFormat(tt.pct0).tickSizeOuter(0));
+    tt.axisStyle(gx);
+    svg.append('text').attr('x', (ml + W - 8) / 2).attr('y', H - 4).attr('text-anchor', 'middle').style('font-size', 'var(--cds-font-size-caption)').attr('fill', tt.css('--color-fg-muted')).text('Predicted chance of an up day');
+    const models = [['TCN (calibrated)', dash.colors[0]], ['Logistic', dash.colors[1]]];
+    const tip = tt.tip(el);
+    for (const [m, c] of models.slice().reverse()) {
+      const pts = rows.filter((r) => r.model === m).sort((a, b) => a.predicted - b.predicted);
+      svg.append('path').datum(pts).attr('fill', 'none').attr('stroke', c).attr('stroke-width', 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round')
+        .attr('d', d3.line().x((d) => x(d.predicted)).y((d) => y(d.actual)));
+      svg.append('g').selectAll('circle').data(pts).join('circle').attr('cx', (d) => x(d.predicted)).attr('cy', (d) => y(d.actual)).attr('r', 4.5)
+        .attr('fill', c).attr('stroke', tt.css('--color-panel')).attr('stroke-width', 2)
+        .on('pointerenter pointermove', (ev, d) => {
+          tt.tipRows(tip, `${m} · decile ${d.decile}`, [
+            { name: 'Predicted', color: c, value: tt.pct(d.predicted) },
+            { name: 'Actually up', color: c, value: tt.pct(d.actual) },
+            { name: 'Days', color: 'transparent', value: d3.format(',')(d.n) },
+          ]);
+          tip.hidden = false; const [mx, my] = d3.pointer(ev, el); tt.placeTip(el, tip, mx, my);
+        })
+        .on('pointerleave', () => { tip.hidden = true; });
+    }
+  });
+</script>
+
+<script>
+  // ---------- tables ----------
+  const fillTable = (name, source, cols) => dash.draw(name, (tb) => {
+    tb.replaceChildren();
+    const rows = tt.rows(source);
+    for (const r of rows) {
+      const tr = document.createElement('tr');
+      if (cols.key) tr.dataset.key = String(r[cols.key]);
+      if (cols.highlight && cols.highlight(r)) tr.className = 'hl';
+      for (const c of cols.list) {
+        const td = document.createElement('td');
+        const v = r[c.f];
+        td.textContent = v == null ? '—' : c.fmt ? c.fmt(v) : String(v);
+        if (c.num) td.classList.add('num');
+        if (c.cls) { const k = c.cls(v, r); if (k) td.classList.add(k); }
+        tr.appendChild(td);
+      }
+      tb.appendChild(tr);
+    }
+  });
+  fillTable('perf', 'perf_real', {
+    highlight: (r) => r.strategy === 'TCN + risk map',
+    list: [
+      { f: 'strategy' }, { f: 'cagr', fmt: tt.pct, num: true }, { f: 'volatility', fmt: tt.pct, num: true },
+      { f: 'sharpe', fmt: tt.f2, num: true }, { f: 'max_drawdown', fmt: tt.pct, num: true },
+      { f: 'exposure', fmt: tt.f2, num: true }, { f: 'turnover', fmt: tt.f1, num: true },
+    ],
+  });
+  fillTable('predq', 'predq_real', {
+    highlight: (r) => r.model === 'TCN (calibrated)',
+    list: [{ f: 'model' }, { f: 'auc', fmt: tt.f3, num: true }, { f: 'accuracy', fmt: tt.pct, num: true },
+      { f: 'brier', fmt: (v) => d3.format('.4f')(v), num: true }, { f: 'log_loss', fmt: (v) => d3.format('.4f')(v), num: true }],
+  });
+  dash.draw('runs', (tb) => {
+    tb.replaceChildren();
+    const rows = tt.rows('runs').slice().sort((a, b) => (a.run < b.run ? 1 : -1));
+    const cols = [
+      { f: 'date' }, { f: 'mode' }, { f: 'retrain' }, { f: 'test_period', fmt: (v) => v.replace('->', '–') },
+      { f: 'tcn_sharpe', fmt: tt.f2, num: true }, { f: 'bh_sharpe', fmt: tt.f2, num: true }, { f: 'tcn_auc', fmt: tt.f3, num: true },
+      { f: 'p_not_better', fmt: tt.pct0, num: true, cls: (v, r) => (r.mode === 'Real' ? (v < 0.05 ? 'good' : v >= 0.2 ? 'bad' : 'meh') : null) },
+      { f: 'verdict' },
+    ];
+    for (const r of rows) {
+      const tr = document.createElement('tr'); tr.dataset.key = r.run;
+      for (const c of cols) {
+        const td = document.createElement('td'); const v = r[c.f];
+        td.textContent = v == null ? '—' : c.fmt ? c.fmt(v) : String(v);
+        if (c.num) td.classList.add('num');
+        if (c.cls) { const k = c.cls(v, r); if (k) td.classList.add(k); }
+        tr.appendChild(td);
+      }
+      tb.appendChild(tr);
+    }
+  });
+  dash.draw('roadmap', (tb) => {
+    tb.replaceChildren();
+    const rows = tt.rows('roadmap').slice().sort((a, b) => a.order - b.order);
+    let prev = null;
+    for (const r of rows) {
+      const tr = document.createElement('tr'); tr.dataset.key = String(r.order);
+      const p = document.createElement('td'); p.textContent = r.phase; if (r.phase === prev) p.className = 'repeat'; prev = r.phase;
+      const it = document.createElement('td'); it.textContent = r.item;
+      const st = document.createElement('td'); st.textContent = r.status; st.className = r.done ? 'done' : 'todo';
+      tr.append(p, it, st); tb.appendChild(tr);
+    }
+  });
+</script>

@@ -987,7 +987,7 @@
   const lgTot = (name, strat) => dash.draw(name, (el) => {
     const r = tt.rows('ledger_strategies').find((x) => x.strategy === strat);
     el.classList.remove('good', 'bad');
-    if (!r) { el.textContent = '—'; return; }
+    if (!r || !(+r.days > 0)) { el.textContent = '—'; return; }
     el.textContent = d3.format('+.2%')(+r.total_return);
     el.classList.add(+r.total_return >= 0 ? 'good' : 'bad');
   });

@@ -207,6 +207,11 @@ def summarize(pos: pd.DataFrame, m: dict):
     scored = pos[pos["strategy_return"].notna() & (pos["target_date"] != "")].copy()
     eq_rows, summ = [], {"updated_utc": now_utc(), "model_version": m["version"] if m else None,
                          "model_trained_through": m["trained_through"] if m else None, "strategies": []}
+    # Growth of $1 starts at 1.0 on the first decision date (before any session is scored)
+    first_dec = pos["decision_date"].min() if len(pos) else None
+    if first_dec:
+        for s in STRATS:
+            eq_rows.append({"date": first_dec, "strategy": s, "value": 1.0})
     if len(scored):
         daily = scored.groupby(["target_date", "strategy"])["strategy_return"].mean().unstack()
         daily = daily.sort_index()
@@ -224,6 +229,9 @@ def summarize(pos: pd.DataFrame, m: dict):
                 })
         summ["first_scored"] = str(daily.index.min())
         summ["last_scored"] = str(daily.index.max())
+    else:
+        summ["strategies"] = [{"strategy": s, "days": 0, "total_return": 0.0, "best_day": None,
+                               "worst_day": None, "hit_rate": None} for s in STRATS]
     latest_dec = pos["decision_date"].max() if len(pos) else None
     summ["latest_decision_date"] = latest_dec
     if latest_dec:

@@ -40,7 +40,7 @@ def main():
     if os.path.exists(lp):
         L = json.load(open(lp))
         lines += ["## Paper trading", ""]
-        if L.get("strategies"):
+        if any(st["days"] for st in L.get("strategies", [])):
             lines.append(f"Scored days: {L.get('first_scored')} to {L.get('last_scored')}.")
             for st in L["strategies"]:
                 lines.append(f"- {st['strategy']}: {st['total_return']:+.2%} over {st['days']} day(s); "

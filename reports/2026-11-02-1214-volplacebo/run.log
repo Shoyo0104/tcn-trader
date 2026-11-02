@@ -1,0 +1,60 @@
+  df.drop(
+  df.rename(columns={
+  df.drop(
+  df.rename(columns={
+  df.drop(
+  df.rename(columns={
+  df.drop(
+  df.rename(columns={
+Data:
+  SPY      2005-01-03 -> 2026-10-30 (5492 days)
+  QQQ      2005-01-03 -> 2026-10-30 (5492 days)
+  XIU.TO   2005-01-04 -> 2026-10-30 (5480 days)
+  XEQT.TO  2019-08-14 -> 2026-10-30 (1811 days)
+Vol walk-forward: 12 yearly retrains, rolling 10-year window, horizon 5 days   [PLACEBO]
+  2015: train   7384  test   755   R2 ewma -0.001  ewma-cal -0.011  har -0.015  gbm -0.091
+  2016: train   7531  test   755   R2 ewma +0.077  ewma-cal -0.261  har -0.240  gbm -0.303
+  2017: train   7533  test   752   R2 ewma -0.059  ewma-cal -1.976  har -1.968  gbm -2.148
+  2018: train   7531  test   753   R2 ewma +0.397  ewma-cal +0.004  har -0.013  gbm -0.053
+  2019: train   7526  test   802   R2 ewma +0.006  ewma-cal -0.066  har -0.065  gbm -0.081
+  2020: train   7569  test  1010   R2 ewma +0.417  ewma-cal -0.385  har -0.356  gbm -0.427
+  2021: train   7824  test  1006   R2 ewma +0.091  ewma-cal -0.037  har -0.021  gbm -0.082
+  2022: train   8078  test  1002   R2 ewma +0.317  ewma-cal -1.605  har -1.621  gbm -1.740
+  2023: train   8327  test  1000   R2 ewma +0.109  ewma-cal -0.001  har +0.004  gbm -0.006
+  2024: train   8572  test  1008   R2 ewma +0.128  ewma-cal -0.018  har -0.012  gbm -0.085
+  2025: train   8825  test  1002   R2 ewma +0.088  ewma-cal +0.003  har +0.001  gbm -0.051
+  2026: train   9072  test   816   R2 ewma +0.084  ewma-cal -0.032  har -0.032  gbm -0.097
+
+=== Forecast quality (out-of-sample) ===
+                         R2 (log vol)  R2 (avg per year)  RMSE (log vol)   QLIKE  Correlation
+EWMA (current risk map)        0.2579             0.1378          0.6073  0.5234       0.5579
+EWMA recalibrated             -0.0645            -0.3653          0.7274  0.8737      -0.2011
+HAR                           -0.0608            -0.3616          0.7261  0.8676      -0.1849
+Gradient boosting             -0.1048            -0.4304          0.7410  0.9240      -0.1387
+
+=== Vol-targeting strategy using each forecast (after costs) ===
+                         CAGR Volatility Sharpe Max drawdown Yearly vol miss Worst month
+EWMA (current risk map)  7.6%       9.1%   0.85       -14.9%            1.3%       -6.4%
+EWMA recalibrated        6.7%       8.0%   0.85       -16.2%            3.7%       -8.3%
+HAR                      6.7%       7.9%   0.85       -16.1%            3.7%       -8.3%
+Gradient boosting        5.7%       8.0%   0.73       -16.5%            3.7%       -8.4%
+
+=== R2 by year ===
+        EWMA (current risk map)  EWMA recalibrated    HAR  Gradient boosting
+period                                                                      
+2015                     -0.001             -0.011 -0.015             -0.091
+2016                      0.077             -0.261 -0.240             -0.303
+2017                     -0.059             -1.976 -1.968             -2.148
+2018                      0.397              0.004 -0.013             -0.053
+2019                      0.006             -0.066 -0.065             -0.081
+2020                      0.417             -0.385 -0.356             -0.427
+2021                      0.091             -0.037 -0.021             -0.082
+2022                      0.317             -1.605 -1.621             -1.740
+2023                      0.109             -0.001  0.004             -0.006
+2024                      0.128             -0.018 -0.012             -0.085
+2025                      0.088              0.003  0.001             -0.051
+2026                      0.084             -0.032 -0.032             -0.097
+
+Best forecast by QLIKE: EWMA (current risk map)
+
+Saved report to ./reports/2026-11-02-1214-volplacebo/

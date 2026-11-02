@@ -497,7 +497,8 @@
   });
   dash.draw('runs', (tb) => {
     tb.replaceChildren();
-    const rows = tt.rows('runs').slice().sort((a, b) => (a.run < b.run ? 1 : -1));
+    const when = (r) => `${r.date} ${r.time_utc ?? '00:00'} ${r.mode === 'Real' ? 1 : 0}`;
+    const rows = tt.rows('runs').slice().sort((a, b) => when(b).localeCompare(when(a)));
     const cols = [
       { f: 'date' }, { f: 'mode' }, { f: 'retrain' }, { f: 'test_period', fmt: (v) => v.replace('->', '–') },
       { f: 'tcn_sharpe', fmt: tt.f2, num: true }, { f: 'bh_sharpe', fmt: tt.f2, num: true }, { f: 'tcn_auc', fmt: tt.f3, num: true },

@@ -34,10 +34,11 @@ def parse_report(folder):
     """Read one report folder into a dict of everything the dashboard needs."""
     name = os.path.basename(folder.rstrip("/"))
     # Folder names: <date>[-<HHMM UTC>]-<freq>-<mode>, e.g. 2026-11-02-1145-Y-real
-    m = re.match(r"(\d{4}-\d{2}-\d{2})(?:-\d{4})?-([MY])-(real|placebo)$", name)
+    m = re.match(r"(\d{4}-\d{2}-\d{2})(?:-(\d{4}))?-([MY])-(real|placebo)$", name)
     if not m:
         return None
-    rep = {"run": name, "date": m.group(1), "freq": m.group(2), "mode": m.group(3), "folder": folder}
+    rep = {"run": name, "date": m.group(1), "time": m.group(2) or "0000", "freq": m.group(3),
+           "mode": m.group(4), "folder": folder}
     summ = os.path.join(folder, "summary.md")
     if not os.path.exists(summ):
         return None
@@ -77,7 +78,8 @@ def run_row(r):
     perf, predq = r["perf"], r["predq"]
     g = lambda s, c: _num(perf.loc[s, c]) if s in perf.index else None
     return {
-        "run": r["run"], "date": r["date"], "mode": r["mode"].capitalize(), "freq": r["freq"],
+        "run": r["run"], "date": r["date"], "time_utc": f"{r['time'][:2]}:{r['time'][2:]}",
+        "mode": r["mode"].capitalize(), "freq": r["freq"],
         "retrain": {"Y": "Yearly", "M": "Monthly"}[r["freq"]],
         "test_period": r["test_period"], "commit": r["commit"],
         "tcn_sharpe": g("TCN + risk map", "Sharpe"), "lr_sharpe": g("Logistic + risk map", "Sharpe"),
@@ -136,7 +138,7 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     cfg = Config()
     reports = [r for r in (parse_report(f) for f in sorted(glob.glob("reports/*/"))) if r]
-    reports.sort(key=lambda r: (r["date"], r["run"]))
+    reports.sort(key=lambda r: (r["date"], r["time"], r["mode"]))
     real = [r for r in reports if r["mode"] == "real"]
     placebo = [r for r in reports if r["mode"] == "placebo"]
     latest, latest_p = (real[-1] if real else None), (placebo[-1] if placebo else None)

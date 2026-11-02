@@ -2,6 +2,12 @@
 
 The single source of truth for where this project is going. Update the checkboxes as work lands.
 
+## End goal
+
+A decision tool that says **when to buy and when to sell**, for ETFs and individual stocks, using evidence from trends, market regime, volatility and the calendar (earnings, Fed meetings, economic releases). Every signal comes with how often similar past signals worked, how many cases that rests on, and what the downside looked like. It earns trust only through live paper trading, never a backtest alone.
+
+Each phase below builds a piece of that: the insight engine supplies the context (regime, risk), Phase 3 the calendar, Phase 5 individual stocks, and Phase 6 turns it all into buy / sell / hold signals.
+
 ## Operating model (the target system)
 
 | When | What | Where |
@@ -74,6 +80,14 @@ Each addition must improve out-of-sample results vs. the version without it, or 
 - [ ] Mega-cap tech universe as a separate run (AAPL, MSFT, NVDA, AMD, AMZN, META, GOOGL, NFLX + 2015-era laggards INTC, IBM, CSCO, ORCL to limit hindsight bias), judged vs equal-weight buy & hold of the same basket; relative-ranking version
 - [ ] Only if Phases 1-4 show something real
 
+## Phase 6 - Buy / sell decision layer (the end goal)
+
+- [ ] Entry and exit rules per ticker that combine trend, regime, volatility forecast and calendar events (e.g. "buy when trend turns up in a Calm/Normal regime, outside earnings week")
+- [ ] Each signal reports its historical track record: hit rate, average gain/loss, worst case, number of past cases and separate episodes
+- [ ] Signals judged against simply holding the same stock, after costs, walk-forward, with a placebo
+- [ ] Signals logged daily before the open and scored in the paper-trading ledger
+- [ ] Dashboard view per ticker: current signal, why, and its track record
+
 ## Go / no-go for real money
 
 All must be true before considering real positions (small size only):
@@ -102,3 +116,4 @@ All must be true before considering real positions (small size only):
 | 2026-11-02 | Corrected vol run (after the fixes): R2 avg per year EWMA 0.14, recalibrated EWMA 0.20, HAR 0.28, boosting 0.27; placebo passed. But in the vol-targeting test raw EWMA still sizes best (Sharpe 0.85 vs ~0.78; yearly vol miss 1.3% vs ~2.8%): corrected forecasts over-estimate the risk level. Risk map keeps EWMA. Next: calibrate the forecast level for sizing on validation data |
 | 2026-11-02 | Headline vol forecast in daily insights = HAR: tied with boosting, simpler and more transparent. (An earlier note picked boosting on pre-fix results; superseded.) Both choices were made after seeing test results; the experiment registry will count them |
 | 2026-11-02 | Regime statistics report separate episodes, not just days: overlapping 21-day windows overstate the evidence |
+| 2026-11-02 | End goal set: a buy / sell timing tool for ETFs and individual stocks, driven by trend, regime, volatility and calendar evidence (new Phase 6), validated by live paper trading |

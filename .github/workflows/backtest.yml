@@ -51,7 +51,7 @@ jobs:
           FREQ: ${{ github.event.inputs.freq || 'Y' }}
           EPOCHS: ${{ github.event.inputs.epochs || '40' }}
         run: |
-          STAMP=$(date -u +%Y-%m-%d)
+          STAMP=$(date -u +%Y-%m-%d-%H%M)
           OUT="reports/${STAMP}-${FREQ}-${{ matrix.mode }}"
           FLAGS="--freq $FREQ --epochs $EPOCHS --out $OUT"
           if [ "${{ matrix.mode }}" = "placebo" ]; then FLAGS="$FLAGS --placebo"; fi

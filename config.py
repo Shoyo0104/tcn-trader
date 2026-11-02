@@ -5,7 +5,9 @@ from dataclasses import dataclass, field
 @dataclass
 class Config:
     # ---- Data ----
-    tickers: list = field(default_factory=lambda: ["SPY", "QQQ", "XIU.TO"])
+    tickers: list = field(default_factory=lambda: ["SPY", "QQQ", "XIU.TO", "XEQT.TO"])
+    # XEQT.TO (iShares Core Equity ETF Portfolio) only exists from Aug 2019: it enters training
+    # and testing once its history exists; earlier periods use the other tickers.
     start: str = "2005-01-01"          # first day of history to download (10y window + test period)
     data_dir: str = "data"             # cached CSVs go here
     results_dir: str = "results"

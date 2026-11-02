@@ -33,7 +33,8 @@ def _num(s):
 def parse_report(folder):
     """Read one report folder into a dict of everything the dashboard needs."""
     name = os.path.basename(folder.rstrip("/"))
-    m = re.match(r"(\d{4}-\d{2}-\d{2})-([MY])-(real|placebo)$", name)
+    # Folder names: <date>[-<HHMM UTC>]-<freq>-<mode>, e.g. 2026-11-02-1145-Y-real
+    m = re.match(r"(\d{4}-\d{2}-\d{2})(?:-\d{4})?-([MY])-(real|placebo)$", name)
     if not m:
         return None
     rep = {"run": name, "date": m.group(1), "freq": m.group(2), "mode": m.group(3), "folder": folder}

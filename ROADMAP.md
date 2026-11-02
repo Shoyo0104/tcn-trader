@@ -25,7 +25,7 @@ Why monthly, not daily: one extra day barely changes a 10-year training set, ret
 - [x] Project dashboard (claude.ai) fed by `dashboard_export.py`
 - [ ] Report AUC averaged within each retrain period, not only pooled (pooling mixes period-level base-rate shifts)
 - [ ] Set up the gaming laptop (CUDA PyTorch), run the full monthly backtest
-- [ ] Decide the ticker list (5-10 liquid ETFs)
+- [ ] Decide the ticker list (5-10 liquid ETFs) - currently SPY, QQQ, XIU.TO, XEQT.TO
 - [ ] Save trained models with version + training-date metadata (`models/`)
 - [ ] Champion vs. challenger promotion logic
 - [ ] Daily job: data update -> prediction -> append to `ledger/predictions.csv` (prediction made before the open, timestamped)
@@ -76,3 +76,4 @@ All must be true before considering real positions (small size only):
 | 2026-11-02 | Real market data only; synthetic tests removed, replaced by a real-data placebo (shuffled training labels) check |
 | 2026-11-02 | Floor on signal scale (`min_signal_scale` = 0.02) so near-constant predictions aren't amplified into trades |
 | 2026-11-02 | First real-data backtest (SPY, QQQ, XIU.TO; 2015-2026; yearly retrain): price-only TCN shows no edge (Sharpe 0.56 vs vol-scaled 0.84; per-year AUC ~0.50). Placebo passed. Baseline established; next work aims to beat it |
+| 2026-11-02 | Added XEQT.TO to the universe (history from Aug 2019). Re-ran backtest + placebo so results stay comparable |

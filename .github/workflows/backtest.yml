@@ -1,0 +1,73 @@
+name: Real-data backtest
+
+# Runs the walk-forward backtest on real market data and commits the report to reports/.
+# Trigger: Actions tab -> "Real-data backtest" -> Run workflow,
+#          or push a commit whose message contains [backtest].
+on:
+  workflow_dispatch:
+    inputs:
+      freq:
+        description: "Retrain frequency: Y (yearly, ~30 min) or M (monthly, hours - better on the laptop GPU)"
+        default: "Y"
+        type: choice
+        options: ["Y", "M"]
+      epochs:
+        description: "Max epochs per retrain"
+        default: "40"
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: backtest
+  cancel-in-progress: false
+
+jobs:
+  backtest:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[backtest]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [real, placebo]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install (CPU PyTorch)
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
+
+      - name: Run backtest
+        env:
+          FREQ: ${{ github.event.inputs.freq || 'Y' }}
+          EPOCHS: ${{ github.event.inputs.epochs || '40' }}
+        run: |
+          STAMP=$(date -u +%Y-%m-%d)
+          OUT="reports/${STAMP}-${FREQ}-${{ matrix.mode }}"
+          FLAGS="--freq $FREQ --epochs $EPOCHS --out $OUT"
+          if [ "${{ matrix.mode }}" = "placebo" ]; then FLAGS="$FLAGS --placebo"; fi
+          python run.py backtest $FLAGS 2>&1 | tee run.log
+          cp run.log "$OUT/run.log"
+          rm -f "$OUT/predictions.csv.gz"; gzip -f "$OUT/predictions.csv"
+          echo "OUT=$OUT" >> $GITHUB_ENV
+
+      - name: Commit report
+        run: |
+          git config user.name "tcn-trader-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$OUT"
+          git commit -m "Backtest report: $OUT [skip ci]"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep $((i * 10))
+          done
+          exit 1

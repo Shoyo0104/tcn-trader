@@ -41,6 +41,7 @@ class Config:
     vol_span: int = 20                 # EWMA span for the volatility forecast sigma_hat
     signal_sd: float = 2.0             # raw signal is divided by (signal_sd x its validation std),
                                        # so a 2-standard-deviation signal = full conviction
+    min_signal_scale: float = 0.02     # floor on that divisor (p must move >= ~1% from 0.5 to matter)
     tau: float = 0.25                  # deadband on the rescaled signal: |s| below this -> no position
     w_min: float = 0.0                 # 0 = long-or-flat (no shorting). Use -1.0 to allow shorts.
     w_max: float = 1.0                 # 1.0 = no leverage

@@ -35,13 +35,17 @@ def test_periods(dates, cfg, years=None):
     return periods
 
 
-def walk_forward(data, cfg, years=None, verbose=True):
+def walk_forward(data, cfg, years=None, verbose=True, placebo=False):
+    """placebo=True: shuffle the TRAINING labels (test labels stay real). A model that learned
+    from shuffled labels has nothing real to know, so it must show no edge on the real test data.
+    If it does, something is leaking. This is the real-data leakage check."""
     dates = data["date"].values
     labeled = ~np.isnan(data["y"])
     periods = test_periods(dates[labeled], cfg, years)
+    rng = np.random.default_rng(cfg.seed)
     if verbose:
         print(f"Walk-forward: {len(periods)} retrains ({cfg.retrain_freq}), "
-              f"rolling {cfg.train_years}-year training window")
+              f"rolling {cfg.train_years}-year training window" + ("   [PLACEBO]" if placebo else ""))
     rows = []
     for P in periods:
         test_start = np.datetime64(P.start_time.normalize())
@@ -53,6 +57,8 @@ def walk_forward(data, cfg, years=None, verbose=True):
         sc = Scaler().fit(data["X"][tr])
         Xtr, Xva, Xte = (sc.transform(data["X"][m]) for m in (tr, va, te))
         ytr, yva = data["y"][tr], data["y"][va]
+        if placebo:
+            ytr, yva = rng.permutation(ytr), rng.permutation(yva)
 
         tcn = train_tcn(Xtr, ytr, Xva, yva, cfg)
         lg_va = predict_logits(tcn, Xva)

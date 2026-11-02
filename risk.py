@@ -19,7 +19,9 @@ def signal_scale(p_val, cfg):
     never trade. We rescale so 'signal_sd' standard deviations of the signal = full conviction (+/-1).
     """
     sd = np.std(2.0 * np.asarray(p_val) - 1.0)
-    return max(cfg.signal_sd * sd, 1e-6)
+    # Floor: a model whose predictions barely move must not have its tiny wiggles
+    # amplified into full-conviction trades.
+    return max(cfg.signal_sd * sd, cfg.min_signal_scale)
 
 
 def position(p_hat, sigma_hat, cfg, scale=1.0, tau=None):

@@ -30,22 +30,29 @@ Works on CPU. Uses an NVIDIA GPU (CUDA) or Apple Silicon (MPS) automatically if 
 
 | Command | What it does |
 |---|---|
-| `python run.py backtest --synthetic` | Pure random data. The model should find **nothing** and stay out. Run this first. |
-| `python run.py backtest --synthetic --edge 0.15` | Random data with a planted pattern. The model **should** find it. |
-| `python run.py backtest` | The real thing: walk-forward test on real tickers (2015 onward), retraining monthly on a rolling 10-year window, exactly like the live plan. |
-| `python run.py backtest --freq Y` | Same, but retrains yearly. About 12x faster; good for quick experiments. |
-| `python run.py signal` | Trains on all history and prints a suggested position for the next trading day. |
+All commands use real market data (Yahoo Finance, adjusted for splits and dividends).
 
-Useful flags: `--tickers SPY QQQ XIU.TO`, `--epochs 15`, `--start-year 2020 --end-year 2022` (faster), `--refresh` (re-download data).
+| Command | What it does |
+|---|---|
+| `python run.py backtest` | Walk-forward test on real tickers (2015 onward), retraining monthly on a rolling 10-year window, exactly like the live plan. |
+| `python run.py backtest --freq Y` | Same, but retrains yearly. About 12x faster; good for quick experiments. |
+| `python run.py backtest --placebo` | **Leakage check.** Trains on shuffled labels and tests on the real ones. A model that learned nothing real must show no edge. If it does, something is leaking. Run it after every significant change. |
+| `python run.py signal` | Trains on the latest 10 years and prints a suggested position for the next trading day. |
+
+Useful flags: `--tickers SPY QQQ XIU.TO`, `--epochs 15`, `--start-year 2020 --end-year 2022` (faster), `--refresh` (re-download data), `--out reports/my-run` (output folder).
 
 A full monthly backtest retrains ~140 times. That's hours on a CPU but much faster on a GPU. Use `--freq Y` while experimenting.
+
+### Running in the cloud (GitHub Actions)
+
+The **Real-data backtest** workflow runs the backtest and the placebo check side by side on GitHub's servers and commits the reports to `reports/`. Start it from the repo's Actions tab ("Run workflow"), or push a commit with `[backtest]` in the message. Yearly mode takes about 30-60 minutes; monthly mode is better on the laptop GPU.
 
 ## Files
 
 | File | Job |
 |---|---|
 | `config.py` | Every setting. Change things here. |
-| `data.py` | Downloads and caches daily data (Yahoo Finance); synthetic test data. |
+| `data.py` | Downloads, caches and quality-checks daily data (Yahoo Finance). Refreshes the cache automatically when it's behind. |
 | `features.py` | The 12 features, the label, 64-day windows, the scaler. |
 | `model.py` | TCN, training with early stopping, Platt calibration, logistic baseline. |
 | `risk.py` | The deadbanded volatility-scaled risk map. |
@@ -60,10 +67,14 @@ A full monthly backtest retrains ~140 times. That's hours on a CPU but much fast
 - **Costs included** (`cost_bps`, default 5 bps per 100% of position traded).
 - **Baselines.** The TCN must beat: buy & hold, a vol-scaled always-long position (the risk map with no prediction), and a logistic regression through the same risk map. If it can't beat the logistic, the deep learning isn't adding anything.
 - **Bootstrap test.** Re-draws history 2,000 times to see how often TCN would *not* beat the vol-scaled baseline. Above ~20% means you can't tell it from luck.
+- **Placebo run.** Same pipeline, shuffled training labels, real test labels. Must show no edge.
+- **Data quality checks.** Warns about non-positive prices, impossible bars, >25% daily moves (bad split adjustments), long gaps, and short histories.
 
-## Outputs (in `results/`)
+## Outputs (in `results/`, or the `--out` folder)
 
+- `summary.md` - the full report in one readable page: performance, prediction quality, Sharpe by year, significance, charts, and the exact config used
 - `performance.csv` - CAGR, volatility, Sharpe, max drawdown, exposure, turnover
+- `yearly_sharpe.csv` - Sharpe ratio per strategy per year (does the edge hold up every year, or come from one lucky year?)
 - `prediction_quality.csv` - AUC, accuracy, Brier score, log loss vs. the base rate
 - `equity.png` - growth of $1 for every strategy
 - `calibration.png` - predicted vs. actual up-day rate (dots on the diagonal = honest probabilities)
@@ -71,7 +82,7 @@ A full monthly backtest retrains ~140 times. That's hours on a CPU but much fast
 
 ## One deviation from the original diagram
 
-Calibrated probabilities on real markets sit very close to 50% (often 0.47-0.53). Fed straight into the deadband, the strategy would almost never trade. So the raw signal `2p - 1` is first divided by `signal_sd` x its standard deviation **on the validation set** (never the test set), then clipped to [-1, 1]. `tau` is applied to that rescaled signal.
+Calibrated probabilities on real markets sit very close to 50% (often 0.47-0.53). Fed straight into the deadband, the strategy would almost never trade. So the raw signal `2p - 1` is first divided by `signal_sd` x its standard deviation **on the validation set** (never the test set), then clipped to [-1, 1]. `tau` is applied to that rescaled signal. The divisor has a floor (`min_signal_scale`) so a model whose predictions barely move can't have its tiny wiggles amplified into full-conviction trades.
 
 ## Research rules
 

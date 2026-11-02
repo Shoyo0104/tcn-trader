@@ -18,9 +18,11 @@ Why monthly, not daily: one extra day barely changes a 10-year training set, ret
 
 - [x] TCN + calibrated sigmoid head + deadbanded volatility-scaled risk map
 - [x] Walk-forward backtest with costs, baselines (buy & hold, vol-scaled long, logistic), bootstrap significance test
-- [x] Synthetic-data sanity tests (pure noise -> no trades; planted pattern -> found)
 - [x] Monthly retraining on a rolling 10-year window, matching the live plan
-- [ ] Set up the gaming laptop (CUDA PyTorch), run the first **real-data** backtest, record results in `results/` notes
+- [x] Real data only: data quality checks, auto-refreshing cache, placebo (shuffled-label) leakage check
+- [x] GitHub Actions workflow: real-data backtest + placebo in the cloud, reports committed to `reports/`
+- [ ] First real-data backtest (yearly mode, cloud) - review report
+- [ ] Set up the gaming laptop (CUDA PyTorch), run the full monthly backtest
 - [ ] Decide the ticker list (5-10 liquid ETFs)
 - [ ] Save trained models with version + training-date metadata (`models/`)
 - [ ] Champion vs. challenger promotion logic
@@ -69,3 +71,5 @@ All must be true before considering real positions (small size only):
 | 2026-11-02 | Retrain monthly on a rolling 10-year window; champion vs. challenger promotion |
 | 2026-11-02 | Long-or-flat (no shorting), no leverage, 5 bps cost assumption |
 | 2026-11-02 | Phased research plan: price-only -> calendar/macro -> research layer -> optional individual stocks |
+| 2026-11-02 | Real market data only; synthetic tests removed, replaced by a real-data placebo (shuffled training labels) check |
+| 2026-11-02 | Floor on signal scale (`min_signal_scale` = 0.02) so near-constant predictions aren't amplified into trades |

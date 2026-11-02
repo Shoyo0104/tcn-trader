@@ -1,0 +1,60 @@
+  df.drop(
+  df.rename(columns={
+  df.drop(
+  df.rename(columns={
+  df.drop(
+  df.rename(columns={
+  df.drop(
+  df.rename(columns={
+Data:
+  SPY      2005-01-03 -> 2026-10-30 (5492 days)
+  QQQ      2005-01-03 -> 2026-10-30 (5492 days)
+  XIU.TO   2005-01-04 -> 2026-10-30 (5480 days)
+  XEQT.TO  2019-08-14 -> 2026-10-30 (1811 days)
+Samples: 17827  |  window 64 x features 12  |  device cpu
+Walk-forward: 12 retrains (Y), rolling 10-year training window   [PLACEBO]
+  2015: train   5760  val  1446  test   755   TCN AUC 0.538
+  2016: train   6029  val  1513  test   755   TCN AUC 0.525
+  2017: train   6031  val  1513  test   752   TCN AUC 0.528
+  2018: train   6032  val  1510  test   753   TCN AUC 0.512
+  2019: train   6029  val  1508  test   755   TCN AUC 0.518
+  2020: train   6029  val  1508  test   994   TCN AUC 0.519
+  2021: train   6030  val  1745  test  1006   TCN AUC 0.507
+  2022: train   6034  val  1993  test  1002   TCN AUC 0.507
+  2023: train   6274  val  2004  test  1000   TCN AUC 0.506
+  2024: train   6517  val  2006  test  1008   TCN AUC 0.510
+  2025: train   6768  val  2008  test  1002   TCN AUC 0.492
+  2026: train   7017  val  2006  test   832   TCN AUC 0.479
+
+=== Strategy performance (out-of-sample, after costs) ===
+                      CAGR Volatility Sharpe Max drawdown Avg exposure Turnover/yr
+Buy & hold           12.7%      16.1%   0.83       -31.6%         1.00         0.1
+Vol-scaled long       7.5%       9.1%   0.84       -14.9%         0.76         5.8
+Logistic + risk map   3.2%       7.1%   0.48       -13.1%         0.55        32.9
+TCN + risk map        6.5%       8.5%   0.79       -14.9%         0.70         6.7
+
+=== Prediction quality ===
+                            AUC  AUC (avg per period)  Accuracy   Brier  Log loss
+Always 'up' (base rate)  0.5000                0.5000    0.5480  0.2477    0.6885
+Logistic                 0.4988                0.5057    0.5442  0.2489    0.6911
+TCN (calibrated)         0.4904                0.5119    0.5465  0.2492    0.6915
+
+=== Sharpe by year ===
+      Buy & hold  Vol-scaled long  Logistic + risk map  TCN + risk map
+date                                                                  
+2015       -0.04            -0.58                -0.71           -0.58
+2016        1.13             0.93                 0.41            0.93
+2017        2.80             2.72                 2.67            2.72
+2018       -0.38            -0.56                -0.83           -0.35
+2019        2.42             2.08                 2.11            2.08
+2020        0.72             0.77                 0.61            0.53
+2021        2.10             1.88                -0.01            1.87
+2022       -0.96            -1.18                -1.09           -1.18
+2023        1.81             1.44                 0.50            1.11
+2024        1.87             1.83                 1.88            1.66
+2025        1.18             1.24                 0.49            1.15
+2026        1.10             0.61                 0.66            0.61
+
+TCN vs vol-scaled long: mean Sharpe gap -0.05; bootstrap draws where TCN is NOT better: 81% -> indistinguishable from luck
+
+Saved report, tables and charts to ./reports/2026-11-02-1206-Y-placebo/

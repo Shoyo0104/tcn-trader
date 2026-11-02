@@ -223,7 +223,7 @@ def cmd_insights(cfg, args):
         rows.append({
             "ticker": v["ticker"], "as_of_close": str(pd.Timestamp(v["date"]).date()),
             "vol_now": float(v["sigma_hat"]), "vol_forecast_5d": float(v["vol_forecast"]),
-            "vol_forecast_5d_har": float(v["vol_har"]), "vol_pctile": float(v["vol_pctile"]),
+            "vol_forecast_5d_gbm": float(v["vol_gbm"]), "vol_pctile": float(v["vol_pctile"]),
             "regime": cur["regime"],
             "regime_days_hist": int(st["days"]) if st is not None else None,
             "regime_episodes": int(st["episodes"]) if st is not None else None,

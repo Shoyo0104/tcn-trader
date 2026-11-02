@@ -95,7 +95,7 @@
 
       <div class="card wide" id="card-ticker-today">
         <h3>Each ticker today</h3>
-        <p class="note">Volatility forecast from gradient boosting (annualized, the best forecaster in the walk-forward test), where it ranks in that ticker's last 10 years, and what followed past days in today's regime. "Worst 10% of weeks" = the 5-day return that only 1 in 10 past weeks fell below. Episodes = separate stretches of the regime, closer to the real sample size than days.</p>
+        <p class="note">Volatility forecast from HAR (annualized; tied for best in the walk-forward test and the simplest), where it ranks in that ticker's last 10 years, and what followed past days in today's regime. "Worst 10% of weeks" = the 5-day return that only 1 in 10 past weeks fell below. Episodes = separate stretches of the regime, closer to the real sample size than days.</p>
         <div class="tablebox">
           <table data-source="ticker_insights" data-row-key="ticker">
             <thead><tr>

@@ -232,9 +232,10 @@ def fit_current_vol(raw: dict, cfg):
     out = latest[["date", "ticker", "sigma_hat"]].copy()
     out["vol_har"] = np.sqrt(variance_forecast(pred["har"], pred["s2_har"]))
     out["vol_gbm"] = np.sqrt(variance_forecast(pred["gbm"], pred["s2_gbm"]))
-    # The headline forecast is gradient boosting: it had the best out-of-sample R2 in 10 of 12
-    # years in the first walk-forward test (decision log, 2026-11-02).
-    out["vol_forecast"] = out["vol_gbm"]
+    # Headline forecast = HAR. After the data fixes, HAR and gradient boosting are essentially tied
+    # out-of-sample (R2 per year 0.277 vs 0.265), so the simpler, more transparent model leads
+    # (decision log, 2026-11-02).
+    out["vol_forecast"] = out["vol_har"]
     # where today's forecast sits within each ticker's own last-10-year realized 5-day vol
     hist = d[lab_ok & (d["date"] >= last - pd.DateOffset(years=cfg.train_years))]
     out["vol_pctile"] = [float((hist.loc[hist["ticker"] == t, "fwd_rv5"] < v).mean())

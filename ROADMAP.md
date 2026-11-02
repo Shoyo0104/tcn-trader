@@ -37,11 +37,13 @@ Why monthly, not daily: one extra day barely changes a 10-year training set, ret
 
 Goal: move from "guess tomorrow's direction" to "tell me non-obvious, evidence-backed things about the market." Every insight states how many past cases it rests on. Same rules: walk-forward, real data only, placebo where a model is fit.
 
-- [ ] Volatility forecasting: next-5-day realized vol from HAR (classic statistical model) and gradient boosting, vs. the EWMA estimate the risk map uses today; walk-forward, placebo, and a vol-targeting strategy test
-- [ ] Market regime detection: walk-forward Gaussian mixture on SPY's market state (volatility, trend, drawdown), 4 regimes, what historically followed each
-- [ ] Daily insight output: current regime, vol forecast + percentile, regime-conditional downside per ticker
-- [ ] Dashboard "Market insights" section
-- [ ] Plug the best vol forecast into the risk map if it beats EWMA out-of-sample
+- [x] Volatility forecasting: next-5-day realized vol from HAR (classic statistical model) and gradient boosting, vs. the EWMA estimate the risk map uses today; walk-forward, placebo, and a vol-targeting strategy test
+- [x] Market regime detection: walk-forward Gaussian mixture on SPY's market state (volatility, trend, drawdown), 4 regimes, what historically followed each
+- [x] Daily insight output: current regime, vol forecast + percentile, regime-conditional downside per ticker
+- [x] Dashboard "Market insights" and "Volatility forecasting" sections
+- [ ] Plug the best vol forecast into the risk map if it beats EWMA out-of-sample (not yet: EWMA still sizes best)
+- [ ] Calibrate the vol forecast's level for position sizing on validation data (current forecasts over-estimate the risk level)
+- [ ] Run insights daily (GitHub Actions schedule) so the dashboard's Market insights stay current
 - [ ] Range forecasts: quantile regression for 5-day return ranges (e.g. 10% chance of falling more than X)
 - [ ] Unusual-day detection: how unlike history today's cross-asset picture is, plus the most similar past days
 - [ ] Cross-asset signals: bonds (TLT), gold, US dollar, oil; flag when usual relationships break
@@ -97,5 +99,6 @@ All must be true before considering real positions (small size only):
 | 2026-11-02 | Added XEQT.TO to the universe (history from Aug 2019). Re-ran backtest + placebo so results stay comparable |
 | 2026-11-02 | New Phase 2 "Insight engine": refocus from next-day direction (no edge found) to evidence-backed insights; start with volatility forecasting + regime detection. Later phases renumbered 3-5 |
 | 2026-11-02 | First vol-forecast run: next-week volatility IS forecastable (R2 avg per year: EWMA 0.14, recalibrated EWMA 0.20, HAR 0.23, gradient boosting 0.27; boosting beat raw EWMA in 10 of 12 years). Placebo passed (fitted models' skill vanished). Fixes before trusting variance-space results: floor range-based vol at 2% (zero-range days broke HAR's QLIKE), clip forecasts to the training range, lognormal bias correction from held-out training data (log forecasts ran low and over-sized positions) |
-| 2026-11-02 | Headline vol forecast in daily insights = gradient boosting (best R2 in the walk-forward test). Note: chosen after seeing test results; the experiment registry will count it |
+| 2026-11-02 | Corrected vol run (after the fixes): R2 avg per year EWMA 0.14, recalibrated EWMA 0.20, HAR 0.28, boosting 0.27; placebo passed. But in the vol-targeting test raw EWMA still sizes best (Sharpe 0.85 vs ~0.78; yearly vol miss 1.3% vs ~2.8%): corrected forecasts over-estimate the risk level. Risk map keeps EWMA. Next: calibrate the forecast level for sizing on validation data |
+| 2026-11-02 | Headline vol forecast in daily insights = HAR: tied with boosting, simpler and more transparent. (An earlier note picked boosting on pre-fix results; superseded.) Both choices were made after seeing test results; the experiment registry will count them |
 | 2026-11-02 | Regime statistics report separate episodes, not just days: overlapping 21-day windows overstate the evidence |

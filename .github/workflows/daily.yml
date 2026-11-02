@@ -8,11 +8,14 @@ name: Daily after-close run
 #   4. morning_brief.py    the brief Claude sends each morning
 # Everything is committed, so the git history is the audit trail: each position is on record
 # before the session it applies to.
-# Manual run: Actions tab -> "Daily after-close run" -> Run workflow.
+# Manual run: Actions tab -> "Daily after-close run" -> Run workflow,
+#             or push a commit whose message contains [daily].
 on:
   schedule:
     - cron: "45 21 * * 1-5"
   workflow_dispatch:
+  push:
+    branches: [main]
 
 permissions:
   contents: write
@@ -23,6 +26,7 @@ concurrency:
 
 jobs:
   daily:
+    if: github.event_name != 'push' || contains(github.event.head_commit.message, '[daily]')
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:

@@ -53,6 +53,7 @@ Each addition must improve out-of-sample results vs. the version without it, or 
 
 - [ ] Point-in-time fundamentals from SEC EDGAR (revenue, EPS, surprises), stored by **release date**, not fiscal period end
 - [ ] Earnings-date features and post-earnings drift
+- [ ] Mega-cap tech universe as a separate run (AAPL, MSFT, NVDA, AMD, AMZN, META, GOOGL, NFLX + 2015-era laggards INTC, IBM, CSCO, ORCL to limit hindsight bias), judged vs equal-weight buy & hold of the same basket; relative-ranking version
 - [ ] Only if Phases 1-3 show something real
 
 ## Go / no-go for real money

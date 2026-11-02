@@ -1,0 +1,40 @@
+  df.drop(
+  df.rename(columns={
+  df.drop(
+  df.rename(columns={
+  df.drop(
+  df.rename(columns={
+  df.drop(
+  df.rename(columns={
+Data:
+  SPY      2005-01-03 -> 2026-10-30 (5492 days)
+  QQQ      2005-01-03 -> 2026-10-30 (5492 days)
+  XIU.TO   2005-01-04 -> 2026-10-30 (5480 days)
+  XEQT.TO  2019-08-14 -> 2026-10-30 (1811 days)
+Market regimes from SPY (walk-forward, out-of-sample labels):
+  2015: Calm 37%  Normal 50%  Elevated 13%  Stressed 0%
+  2016: Calm 52%  Normal 35%  Elevated 13%  Stressed 0%
+  2017: Calm 99%  Normal 1%  Elevated 0%  Stressed 0%
+  2018: Calm 31%  Normal 44%  Elevated 24%  Stressed 0%
+  2019: Calm 17%  Normal 40%  Elevated 42%  Stressed 0%
+  2020: Calm 16%  Normal 16%  Elevated 40%  Stressed 28%
+  2021: Calm 50%  Normal 50%  Elevated 0%  Stressed 0%
+  2022: Calm 0%  Normal 4%  Elevated 21%  Stressed 75%
+  2023: Calm 11%  Normal 26%  Elevated 37%  Stressed 26%
+  2024: Calm 25%  Normal 46%  Elevated 29%  Stressed 0%
+  2025: Calm 18%  Normal 34%  Elevated 29%  Stressed 19%
+  2026: Calm 29%  Normal 60%  Elevated 11%  Stressed 0%
+
+Market regime (SPY) as of 2026-10-30: Calm (confidence 55%, 2 trading days so far; stretches of this regime have lasted ~11 days on average).
+
+Historically, 57% of Calm days were still Calm 21 trading days later.
+
+SPY: volatility forecast for the next 5 days 14% (higher than 64% of the last 10 years). In past Calm periods (957 days in 54 separate episodes since 2015), the next 21 days averaged +0.4%, were up 65% of the time, and fell more than 5% 5% of the time; the worst 10% of 5-day moves were below -1.5%.
+
+XIU.TO: volatility forecast for the next 5 days 15% (higher than 82% of the last 10 years). In past Calm periods (935 days in 54 separate episodes since 2015), the next 21 days averaged +0.2%, were up 58% of the time, and fell more than 5% 3% of the time; the worst 10% of 5-day moves were below -1.5%.
+
+QQQ: volatility forecast for the next 5 days 29% (higher than 85% of the last 10 years). In past Calm periods (957 days in 54 separate episodes since 2015), the next 21 days averaged +0.7%, were up 65% of the time, and fell more than 5% 9% of the time; the worst 10% of 5-day moves were below -2.6%.
+
+XEQT.TO: volatility forecast for the next 5 days 14% (higher than 73% of the last 10 years). In past Calm periods (381 days in 54 separate episodes since 2015), the next 21 days averaged +0.6%, were up 66% of the time, and fell more than 5% 2% of the time; the worst 10% of 5-day moves were below -1.3%.
+
+Saved insights to ./reports/2026-11-02-1214-insights/

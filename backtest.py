@@ -77,6 +77,7 @@ def walk_forward(data, cfg, years=None, verbose=True, placebo=False):
             "date": dates[te], "ticker": data["ticker"][te], "y": data["y"][te],
             "fwd_ret": data["fwd_ret"][te], "sigma_hat": data["sigma_hat"][te],
             "p_tcn": p_tcn, "p_lr": p_lr, "scale_tcn": sc_tcn, "scale_lr": sc_lr,
+            "period": str(P),
         }))
     return pd.concat(rows, ignore_index=True)
 
@@ -122,14 +123,28 @@ def perf_table(rets, expo):
     return pd.DataFrame(rows).T
 
 
+def period_auc(pred, col, by=None):
+    """AUC computed inside each period, then averaged.
+
+    Pooling every period into one AUC mixes in the differences BETWEEN periods (each retrain has
+    its own base rate), which can push the pooled number away from 0.5 even when the model ranks
+    days within each period no better or worse than chance. The within-period average is the
+    cleaner measure of skill. Groups by retrain period when available, else by calendar year."""
+    key = pred["period"] if (by is None and "period" in pred) else pred["date"].dt.year
+    vals = [roc_auc_score(g["y"], g[col]) for _, g in pred.groupby(key) if g["y"].nunique() > 1 and len(g) >= 50]
+    return float(np.mean(vals)) if vals else np.nan
+
+
 def prediction_table(pred):
     y = pred["y"].values
     base = np.full(len(y), y.mean())
-    rows = {"Always 'up' (base rate)": {"AUC": 0.5, "Accuracy": max(y.mean(), 1 - y.mean()),
+    rows = {"Always 'up' (base rate)": {"AUC": 0.5, "AUC (avg per period)": 0.5,
+                                        "Accuracy": max(y.mean(), 1 - y.mean()),
                                         "Brier": brier_score_loss(y, base), "Log loss": log_loss(y, base)}}
     for name, col in [("Logistic", "p_lr"), ("TCN (calibrated)", "p_tcn")]:
         p = pred[col].values
-        rows[name] = {"AUC": roc_auc_score(y, p), "Accuracy": ((p > 0.5) == y).mean(),
+        rows[name] = {"AUC": roc_auc_score(y, p), "AUC (avg per period)": period_auc(pred, col),
+                      "Accuracy": ((p > 0.5) == y).mean(),
                       "Brier": brier_score_loss(y, p), "Log loss": log_loss(y, np.clip(p, 1e-6, 1 - 1e-6))}
     return pd.DataFrame(rows).T
 

@@ -75,7 +75,7 @@
       <div class="tile" id="tile-auc">
         <div class="label">Prediction skill (AUC)</div>
         <div class="big" data-draw="t-auc" data-source="status" data-field="tcn_auc" data-row="0">—</div>
-        <div class="sub">0.500 = coin flip</div>
+        <div class="sub">Avg per retrain · 0.500 = coin flip</div>
       </div>
       <div class="tile" id="tile-placebo">
         <div class="label">Leakage check</div>
@@ -138,12 +138,13 @@
 
       <div class="card wide" id="card-predq">
         <h3>Prediction quality</h3>
-        <p class="note">AUC: 0.5 = coin flip. Brier and log loss: lower is better; beating "always up" is the bar.</p>
+        <p class="note">AUC: 0.5 = coin flip. "Per period" averages AUC within each retrain period, the fairer measure of skill; "pooled" mixes periods together. Brier and log loss: lower is better; beating "always up" is the bar.</p>
         <div class="tablebox">
           <table data-source="predq_real" data-row-key="model">
             <thead><tr>
               <th data-field="model">Model</th>
-              <th class="num" data-field="auc">AUC</th>
+              <th class="num" data-field="auc_period">AUC (per period)</th>
+              <th class="num" data-field="auc">AUC (pooled)</th>
               <th class="num" data-field="accuracy">Accuracy</th>
               <th class="num" data-field="brier">Brier</th>
               <th class="num" data-field="log_loss">Log loss</th>
@@ -491,7 +492,7 @@
   });
   fillTable('predq', 'predq_real', {
     highlight: (r) => r.model === 'TCN (calibrated)',
-    list: [{ f: 'model' }, { f: 'auc', fmt: tt.f3, num: true }, { f: 'accuracy', fmt: tt.pct, num: true },
+    list: [{ f: 'model' }, { f: 'auc_period', fmt: tt.f3, num: true }, { f: 'auc', fmt: tt.f3, num: true }, { f: 'accuracy', fmt: tt.pct, num: true },
       { f: 'brier', fmt: (v) => d3.format('.4f')(v), num: true }, { f: 'log_loss', fmt: (v) => d3.format('.4f')(v), num: true }],
   });
   dash.draw('runs', (tb) => {

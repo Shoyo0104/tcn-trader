@@ -14,7 +14,7 @@ import re
 import numpy as np
 import pandas as pd
 
-from backtest import strategy_returns
+from backtest import period_auc, strategy_returns
 from config import Config
 
 OUT = "dashboard_data"
@@ -61,6 +61,15 @@ def parse_report(folder):
     if not os.path.exists(pp):
         pp = os.path.join(folder, "predictions.csv")
     rep["pred"] = pd.read_csv(pp, parse_dates=["date"]) if os.path.exists(pp) else None
+    # Within-period AUC (older reports don't have the column: compute it from their predictions)
+    col = "AUC (avg per period)"
+    if col not in predq.columns:
+        predq[col] = np.nan
+        predq.loc["Always 'up' (base rate)", col] = 0.5
+        if rep["pred"] is not None:
+            for name, pc in [("Logistic", "p_lr"), ("TCN (calibrated)", "p_tcn")]:
+                if name in predq.index:
+                    predq.loc[name, col] = period_auc(rep["pred"], pc)
     return rep
 
 
@@ -73,7 +82,8 @@ def run_row(r):
         "test_period": r["test_period"], "commit": r["commit"],
         "tcn_sharpe": g("TCN + risk map", "Sharpe"), "lr_sharpe": g("Logistic + risk map", "Sharpe"),
         "vol_sharpe": g("Vol-scaled long", "Sharpe"), "bh_sharpe": g("Buy & hold", "Sharpe"),
-        "tcn_auc": _num(predq.loc["TCN (calibrated)", "AUC"]) if "TCN (calibrated)" in predq.index else None,
+        "tcn_auc": _num(predq.loc["TCN (calibrated)", "AUC (avg per period)"]) if "TCN (calibrated)" in predq.index else None,
+        "tcn_auc_pooled": _num(predq.loc["TCN (calibrated)", "AUC"]) if "TCN (calibrated)" in predq.index else None,
         "sharpe_gap": r["sharpe_gap"], "p_not_better": r["p_not_better"], "verdict": r["verdict"],
     }
 
@@ -141,7 +151,8 @@ def main():
                          "max_drawdown": _num(row["Max drawdown"]), "exposure": _num(row["Avg exposure"]),
                          "turnover": _num(row["Turnover/yr"])})
         for s, row in r["predq"].iterrows():
-            predq.append({"mode": r["mode"], "model": s, "auc": _num(row["AUC"]),
+            predq.append({"mode": r["mode"], "model": s, "auc_period": _num(row["AUC (avg per period)"]),
+                          "auc": _num(row["AUC"]),
                           "accuracy": _num(row["Accuracy"]), "brier": _num(row["Brier"]),
                           "log_loss": _num(row["Log loss"])})
 
@@ -170,7 +181,7 @@ def main():
             "sharpe_gap": latest["sharpe_gap"], "tcn_sharpe": lr["tcn_sharpe"], "bh_sharpe": lr["bh_sharpe"],
             "vol_sharpe": lr["vol_sharpe"], "lr_sharpe": lr["lr_sharpe"],
             "tcn_cagr": _num(tperf["CAGR"]), "tcn_max_drawdown": _num(tperf["Max drawdown"]),
-            "tcn_auc": lr["tcn_auc"], "placebo_auc": lp.get("tcn_auc"),
+            "tcn_auc": lr["tcn_auc"], "tcn_auc_pooled": lr["tcn_auc_pooled"], "placebo_auc": lp.get("tcn_auc"),
             "placebo_p_not_better": lp.get("p_not_better"),
             "placebo_check": {True: "Passed", False: "Failed", None: "Not run"}[placebo_pass],
             "phase1_done": sum(r["done"] for r in p1), "phase1_total": len(p1),

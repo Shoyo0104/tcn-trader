@@ -1,0 +1,28 @@
+  df.drop(
+  df.rename(columns={
+  df.drop(
+  df.rename(columns={
+  df.drop(
+  df.rename(columns={
+  df.drop(
+  df.rename(columns={
+Data:
+  SPY      2005-01-03 -> 2026-10-30 (5492 days)
+  QQQ      2005-01-03 -> 2026-10-30 (5492 days)
+  XIU.TO   2005-01-04 -> 2026-10-30 (5480 days)
+  XEQT.TO  2019-08-14 -> 2026-10-30 (1811 days)
+Training live TCN (no model, or new month) on data through 2026-10-30 ...
+
+Scored 0 positions; logged 12 new positions (model retrained). Model: tcn-2026-10-29
+  next day SPY      TCN + risk map   weight 0.78  p_up 0.556
+  next day SPY      Vol-scaled long  weight 0.78
+  next day SPY      Buy & hold       weight 1.00
+  next day QQQ      TCN + risk map   weight 0.39  p_up 0.556
+  next day QQQ      Vol-scaled long  weight 0.39
+  next day QQQ      Buy & hold       weight 1.00
+  next day XIU.TO   TCN + risk map   weight 0.81  p_up 0.555
+  next day XIU.TO   Vol-scaled long  weight 0.81
+  next day XIU.TO   Buy & hold       weight 1.00
+  next day XEQT.TO  TCN + risk map   weight 0.78  p_up 0.556
+  next day XEQT.TO  Vol-scaled long  weight 0.78
+  next day XEQT.TO  Buy & hold       weight 1.00

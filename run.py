@@ -222,10 +222,11 @@ def cmd_insights(cfg, args):
         st = st.iloc[0] if len(st) else None
         rows.append({
             "ticker": v["ticker"], "as_of_close": str(pd.Timestamp(v["date"]).date()),
-            "vol_now": float(v["sigma_hat"]), "vol_forecast_5d": float(v["vol_har"]),
-            "vol_forecast_5d_gbm": float(v["vol_gbm"]), "vol_pctile": float(v["vol_pctile"]),
+            "vol_now": float(v["sigma_hat"]), "vol_forecast_5d": float(v["vol_forecast"]),
+            "vol_forecast_5d_har": float(v["vol_har"]), "vol_pctile": float(v["vol_pctile"]),
             "regime": cur["regime"],
             "regime_days_hist": int(st["days"]) if st is not None else None,
+            "regime_episodes": int(st["episodes"]) if st is not None else None,
             "fwd21_mean": float(st["fwd21_mean"]) if st is not None else None,
             "p_up_21d": float(st["p_up_21d"]) if st is not None else None,
             "p_drop5_21d": float(st["p_drop5_21d"]) if st is not None else None,
@@ -252,16 +253,19 @@ def cmd_insights(cfg, args):
         s = (f"**{r['ticker']}**: volatility forecast for the next 5 days {pct(r['vol_forecast_5d'])} "
              f"(higher than {pct(r['vol_pctile'])} of the last 10 years)")
         if r["fwd21_mean"] is not None:
-            s += (f". In past {cur['regime']} periods ({r['regime_days_hist']} days since {summary['test_start'][:4]}), "
+            s += (f". In past {cur['regime']} periods ({r['regime_days_hist']} days in {r['regime_episodes']} separate "
+                  f"episodes since {summary['test_start'][:4]}), "
                   f"the next 21 days averaged {f1(r['fwd21_mean'])}, were up {pct(r['p_up_21d'])} of the time, and fell "
                   f"more than 5% {pct(r['p_drop5_21d'])} of the time; the worst 10% of 5-day moves were below {f1(r['q10_5d'])}.")
         lines.append(s)
-    st_fmt = {c: ("{:.1%}" if c not in ("days", "avg_run_days") else "{:.0f}") for c in stats.columns if c not in ("ticker", "regime")}
+    st_fmt = {c: ("{:.1%}" if c not in ("days", "episodes", "avg_run_days") else "{:.0f}") for c in stats.columns if c not in ("ticker", "regime")}
     mkt_stats = stats[stats["ticker"] == mkt].set_index("regime").drop(columns="ticker")
     meta = {"run_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M"), "commit": git_commit(),
             "as_of": cur["as_of"], "market": mkt, "regime_test_period": f"{summary['test_start']} -> {cur['as_of']}"}
     _write_report(out, "Market insights", meta, [
-        ("Today", "\n\n".join(lines)),
+        ("Today", "\n\n".join(lines) + "\n\nHow much evidence: overlapping 21-day windows are not independent, "
+         "so the episode count, not the day count, is closer to the real sample size. Treat regime "
+         "statistics built on few episodes as rough."),
         (f"What followed each regime ({mkt}, out-of-sample labels)", md_table(mkt_stats, st_fmt)),
         ("Regime profiles (latest fit)", md_table(cur["profile"].set_index("regime"),
                                                    {"typical_vol": "{:.1%}", "typical_3m_return": "{:+.1%}",

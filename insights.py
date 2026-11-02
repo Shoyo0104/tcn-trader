@@ -21,6 +21,7 @@ from sklearn.mixture import GaussianMixture
 
 EPS = 1e-10
 H = 5                                   # forecast horizon in trading days
+VOL_FLOOR = 0.02                        # 2% annualized: floor for range-based daily vol
 VOL_X_HAR = ["lv_d", "lv_w", "lv_m"]
 VOL_X_GBM = VOL_X_HAR + ["lv_ewma", "ret_1", "ret_5", "ret_22", "ma50_dist", "abs_gap", "vol_ratio"]
 REGIME_X = ["lv21", "ret63", "drawdown", "volchg"]
@@ -36,6 +37,9 @@ def vol_features(df: pd.DataFrame, vol_span: int = 20) -> pd.DataFrame:
     o, h, l, c = df["Open"], df["High"], df["Low"], df["Close"]
     r = np.log(c).diff()
     pk = np.log(h / l) ** 2 / (4 * np.log(2))          # Parkinson daily variance (uses the day's range)
+    # Floor: a day whose high equals its low (a data glitch or a halted session) gives zero range,
+    # and log(0) would send the forecasts wild. Treat anything below 2% annualized vol as 2%.
+    pk = pk.clip(lower=VOL_FLOOR ** 2 / 252)
     f = pd.DataFrame(index=df.index)
     f["lv_d"] = 0.5 * np.log(pk * 252 + EPS)
     f["lv_w"] = 0.5 * np.log(pk.rolling(5).mean() * 252 + EPS)
@@ -82,20 +86,48 @@ def stack_vol(raw: dict, vol_span: int) -> pd.DataFrame:
 
 
 # ----------------------------------------------------------------------------- vol models
-def _fit_predict(train: pd.DataFrame, test: pd.DataFrame, seed: int, placebo_rng=None):
-    y = train["y_lv"].values
-    if placebo_rng is not None:
-        y = placebo_rng.permutation(y)
+def _models(seed):
     # EWMA recalibrated: the same EWMA signal, with scale and bias fitted on training data. Raw EWMA
     # in log space is biased (the log of a noisy 5-day realized vol averages below the log of the
     # true vol), so HAR must beat this fair version, not just correct that bias.
-    ewc = LinearRegression().fit(train[["lv_ewma"]].values, y)
-    har = LinearRegression().fit(train[VOL_X_HAR].values, y)
-    gbm = HistGradientBoostingRegressor(max_iter=300, learning_rate=0.05, max_leaf_nodes=15,
-                                        min_samples_leaf=100, l2_regularization=1.0, random_state=seed)
-    gbm.fit(train[VOL_X_GBM].values, y)
-    return {"ewmacal": ewc.predict(test[["lv_ewma"]].values), "har": har.predict(test[VOL_X_HAR].values),
-            "gbm": gbm.predict(test[VOL_X_GBM].values)}
+    return {
+        "ewmacal": (["lv_ewma"], lambda: LinearRegression()),
+        "har": (VOL_X_HAR, lambda: LinearRegression()),
+        "gbm": (VOL_X_GBM, lambda: HistGradientBoostingRegressor(
+            max_iter=300, learning_rate=0.05, max_leaf_nodes=15, min_samples_leaf=100,
+            l2_regularization=1.0, random_state=seed)),
+    }
+
+
+def _fit_predict(train: pd.DataFrame, test: pd.DataFrame, seed: int, placebo_rng=None):
+    """Fit each model on the training window and forecast log vol for `test`.
+
+    Also returns s2 per model: the variance of forecast errors on held-out data (fit on the first
+    80% of the training window, measured on the last 20%). Forecasts are made in log space, which
+    targets the median, not the mean; turning them back into a variance needs the lognormal
+    correction exp(2f + 2*s2), or the forecasts run systematically low and size positions too big.
+    Forecasts are clipped to the range of targets seen in training."""
+    y = train["y_lv"].values
+    if placebo_rng is not None:
+        y = placebo_rng.permutation(y)
+    lo, hi = np.percentile(y, 0.5), np.percentile(y, 99.5)
+    order = np.argsort(train["date"].values, kind="stable")
+    cut = order[: int(len(order) * 0.8)]
+    hold = order[int(len(order) * 0.8):]
+    out = {}
+    for k, (cols, make) in _models(seed).items():
+        Xtr = train[cols].values
+        m_hold = make().fit(Xtr[cut], y[cut])
+        resid = y[hold] - np.clip(m_hold.predict(Xtr[hold]), lo, hi)
+        out[f"s2_{k}"] = float(np.var(resid))
+        m = make().fit(Xtr, y)
+        out[k] = np.clip(m.predict(test[cols].values), lo, hi)
+    return out
+
+
+def variance_forecast(f_log, s2=0.0):
+    """Log-vol forecast -> annualized variance forecast, with the lognormal correction."""
+    return np.exp(2 * np.asarray(f_log) + 2 * s2)
 
 
 def vol_walk_forward(raw: dict, cfg, years=None, placebo=False, verbose=True) -> pd.DataFrame:
@@ -122,9 +154,10 @@ def vol_walk_forward(raw: dict, cfg, years=None, placebo=False, verbose=True) ->
         pred = _fit_predict(tr, te, cfg.seed, rng)
         out = te[["date", "ticker", "y_lv", "fwd_rv5", "fwd_ret1", "sigma_hat"]].copy()
         out["f_ewma"] = te["lv_ewma"].values
-        out["f_ewmacal"] = pred["ewmacal"]
-        out["f_har"] = pred["har"]
-        out["f_gbm"] = pred["gbm"]
+        out["s2_ewma"] = 0.0                      # raw EWMA already estimates variance directly
+        for k in ["ewmacal", "har", "gbm"]:
+            out[f"f_{k}"] = pred[k]
+            out[f"s2_{k}"] = pred[f"s2_{k}"]
         out["period"] = str(Y)
         if verbose:
             r2 = {k: 1 - np.mean((out["y_lv"] - out[f"f_{k}"]) ** 2) / np.var(out["y_lv"]) for k in VOL_MODELS}
@@ -143,7 +176,7 @@ def vol_metrics(pred: pd.DataFrame) -> pd.DataFrame:
     rows = {}
     for k, name in VOL_MODELS.items():
         f = pred[f"f_{k}"].values
-        rv2, h2 = np.exp(2 * y), np.exp(2 * f)
+        rv2, h2 = np.exp(2 * y), variance_forecast(f, pred[f"s2_{k}"].values)
         per = [1 - np.mean((g["y_lv"] - g[f"f_{k}"]) ** 2) / np.var(g["y_lv"]) for _, g in pred.groupby("period")]
         rows[name] = {
             "R2 (log vol)": 1 - np.mean((y - f) ** 2) / np.var(y),
@@ -164,7 +197,7 @@ def vol_target_strategies(pred: pd.DataFrame, cfg) -> tuple:
     for col, name in names.items():
         parts = []
         for t, g in pred.sort_values("date").groupby("ticker"):
-            vol = np.exp(g[col].values)
+            vol = np.sqrt(variance_forecast(g[col].values, g[col.replace("f_", "s2_")].values))
             w = np.clip(cfg.target_vol / np.maximum(vol, 1e-4), cfg.w_min, cfg.w_max)
             cost = cfg.cost_bps / 1e4 * np.abs(np.diff(w, prepend=0.0))
             parts.append(pd.DataFrame({"date": g["date"].values, "ret": w * g["fwd_ret1"].values - cost}))
@@ -197,12 +230,15 @@ def fit_current_vol(raw: dict, cfg):
     latest = d[feat_ok].sort_values("date").groupby("ticker").tail(1)
     pred = _fit_predict(tr, latest, cfg.seed)
     out = latest[["date", "ticker", "sigma_hat"]].copy()
-    out["vol_har"] = np.exp(pred["har"])
-    out["vol_gbm"] = np.exp(pred["gbm"])
+    out["vol_har"] = np.sqrt(variance_forecast(pred["har"], pred["s2_har"]))
+    out["vol_gbm"] = np.sqrt(variance_forecast(pred["gbm"], pred["s2_gbm"]))
+    # The headline forecast is gradient boosting: it had the best out-of-sample R2 in 10 of 12
+    # years in the first walk-forward test (decision log, 2026-11-02).
+    out["vol_forecast"] = out["vol_gbm"]
     # where today's forecast sits within each ticker's own last-10-year realized 5-day vol
     hist = d[lab_ok & (d["date"] >= last - pd.DateOffset(years=cfg.train_years))]
     out["vol_pctile"] = [float((hist.loc[hist["ticker"] == t, "fwd_rv5"] < v).mean())
-                         for t, v in zip(out["ticker"], out["vol_har"])]
+                         for t, v in zip(out["ticker"], out["vol_forecast"])]
     return out
 
 
@@ -266,8 +302,7 @@ def current_regime(state: pd.DataFrame, cfg, smooth: int = 5) -> dict:
             "days_in_regime": int(days_in), "profile": profile}
 
 
-def run_lengths(labels: pd.Series) -> pd.Series:
-    """Average length (trading days) of uninterrupted stretches in each regime."""
+def _runs(labels):
     runs, cur, n = {}, None, 0
     for v in labels:
         if v == cur:
@@ -277,13 +312,25 @@ def run_lengths(labels: pd.Series) -> pd.Series:
                 runs.setdefault(cur, []).append(n)
             cur, n = v, 1
     runs.setdefault(cur, []).append(n)
-    return pd.Series({k: float(np.mean(v)) for k, v in runs.items()})
+    return runs
+
+
+def run_lengths(labels: pd.Series) -> pd.Series:
+    """Average length (trading days) of uninterrupted stretches in each regime."""
+    return pd.Series({k: float(np.mean(v)) for k, v in _runs(labels).items()})
+
+
+def episode_counts(labels: pd.Series, min_days: int = 5) -> pd.Series:
+    """Number of separate stretches (of at least `min_days`) in each regime. Day counts overstate
+    the evidence: 300 days from 4 episodes is really ~4 observations of what that regime does."""
+    return pd.Series({k: int(sum(1 for n in v if n >= min_days)) for k, v in _runs(labels).items()})
 
 
 def regime_stats(raw: dict, regimes: pd.DataFrame, cfg) -> pd.DataFrame:
     """For each ticker and regime: what followed, on days whose outcome window has completed.
     Uses only out-of-sample regime labels."""
     lens = run_lengths(regimes["regime"])
+    eps = episode_counts(regimes["regime"])
     rows = []
     for t, df in raw.items():
         f = vol_features(df, cfg.vol_span).join(regimes["regime"], how="inner")
@@ -293,8 +340,8 @@ def regime_stats(raw: dict, regimes: pd.DataFrame, cfg) -> pd.DataFrame:
             if len(g21) < 20:
                 continue
             rows.append({
-                "ticker": t, "regime": name, "days": int(len(g)), "share": len(g) / len(f),
-                "avg_run_days": float(lens.get(name, np.nan)),
+                "ticker": t, "regime": name, "days": int(len(g)), "episodes": int(eps.get(name, 0)),
+                "share": len(g) / len(f), "avg_run_days": float(lens.get(name, np.nan)),
                 "fwd21_mean": float(g21["fwd_ret21"].mean()), "fwd21_median": float(g21["fwd_ret21"].median()),
                 "p_up_21d": float((g21["fwd_ret21"] > 0).mean()),
                 "p_drop5_21d": float((g21["fwd_ret21"] < -0.05).mean()),

@@ -5,7 +5,7 @@
   .tt h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: var(--cds-gap-xl) 0 var(--cds-gap-sm); }
   .tt h3 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin: 0; }
   .tt .lede { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-body); max-width: 70ch; }
-  .tt .lede .warn { color: var(--color-bad); }
+  .tt .lede .warn, .tt .sub-h .warn { color: var(--color-bad); }
   .tt .note { margin: var(--cds-gap-xs) 0 var(--cds-gap-sm); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
   .tt .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)); gap: var(--cds-gap-md); margin-top: var(--cds-gap-lg); }
   .tt .tile { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); }
@@ -42,12 +42,161 @@
   .tt [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
   .tt .failed { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: inherit; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
   .tt .failed::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+  .tt .sub-h { font-size: var(--cds-font-size-body); color: var(--color-fg-muted); margin: 0 0 var(--cds-gap-sm); max-width: 75ch; }
+  .tt .reg-Calm { color: var(--color-ok); } .tt .reg-Normal { color: var(--color-fg); } .tt .reg-Elevated { color: var(--color-warn); } .tt .reg-Stressed { color: var(--color-bad); }
+  .tt .sw.r0 { background: var(--cds-chart-status-critical); opacity: .06; border: 1px solid var(--cds-border); } .tt .sw.r1 { background: var(--cds-chart-status-critical); opacity: .16; } .tt .sw.r2 { background: var(--cds-chart-status-critical); opacity: .32; } .tt .sw.r3 { background: var(--cds-chart-status-critical); opacity: .55; }
+  .tt .sw.line { background: none; border-top: 2px solid var(--color-fg); height: 0; width: 14px; border-radius: 0; }
+  .tt .ctrl { display: flex; align-items: center; gap: var(--cds-gap-sm); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: var(--cds-gap-xs) 0 var(--cds-gap-sm); }
+  .tt select { font: inherit; color: var(--color-fg); background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 2px var(--cds-pad-sm); }
+  .tt tr.cur td { font-weight: var(--cds-font-weight-medium); }
+  .tt .sw.m0 { background: var(--cds-chart-muted); } .tt .sw.m1 { background: var(--tt-c2); } .tt .sw.m2 { background: var(--tt-c0); } .tt .sw.m3 { background: var(--tt-c1); }
 </style>
 
 <div class="tt">
   <header id="top">
     <h1>TCN Trader</h1>
-    <p class="lede">
+    <p class="lede">A research system on real market data: what kind of market we're in, how risky the coming days look, and whether a model can beat simply holding the market. Every statistic is out-of-sample and shows how many past cases it rests on.</p>
+  </header>
+
+  <section id="insights">
+    <h2>Market insights</h2>
+    <p class="sub-h">As of the close on <b data-draw="ins-asof" data-source="insight_summary" data-field="as_of" data-row="0">—</b>. The market regime comes from SPY's volatility, trend and drawdown, classified using only data available at the time. What followed each regime is measured on every day since <span data-draw="ins-since" data-source="insight_summary" data-field="test_start" data-row="0">—</span>.</p>
+    <p class="note" data-ins-awaiting hidden>No insight report yet.</p>
+    <div class="tiles">
+      <div class="tile" id="tile-regime">
+        <div class="label">Market regime today</div>
+        <div class="big" data-draw="ins-regime" data-source="insight_summary" data-field="regime" data-row="0">—</div>
+        <div class="sub">Confidence <b data-draw="ins-prob" data-source="insight_summary" data-field="regime_prob" data-row="0">—</b> · day <b data-draw="ins-days" data-source="insight_summary" data-field="days_in_regime" data-row="0">—</b> of this stretch</div>
+      </div>
+      <div class="tile" id="tile-stay">
+        <div class="label">Still in this regime 21 trading days later</div>
+        <div class="big" data-draw="ins-stay" data-source="insight_summary" data-field="p_same_regime_21d" data-row="0">—</div>
+        <div class="sub">Stretches last <b data-draw="ins-run" data-source="insight_summary" data-field="avg_run_days" data-row="0">—</b> trading days on average</div>
+      </div>
+      <div class="tile" id="tile-spyvol">
+        <div class="label">SPY volatility forecast, next 5 days</div>
+        <div class="big" data-draw="ins-vol" data-source="ticker_insights" data-where="ticker=SPY" data-field="vol_forecast_5d">—</div>
+        <div class="sub">Higher than <b data-draw="ins-volp" data-source="ticker_insights" data-where="ticker=SPY" data-field="vol_pctile">—</b> of the last 10 years</div>
+      </div>
+      <div class="tile" id="tile-spyfwd">
+        <div class="label">SPY's next 21 days after past days like today</div>
+        <div class="big" data-draw="ins-fwd" data-source="ticker_insights" data-where="ticker=SPY" data-field="fwd21_mean">—</div>
+        <div class="sub">Up <b data-draw="ins-up" data-source="ticker_insights" data-where="ticker=SPY" data-field="p_up_21d">—</b> of the time · fell over 5% in <b data-draw="ins-drop" data-source="ticker_insights" data-where="ticker=SPY" data-field="p_drop5_21d">—</b></div>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top: var(--cds-gap-md)">
+      <div class="card wide" id="card-regime-timeline">
+        <h3>SPY and the market regime over time</h3>
+        <p class="note">Shading shows the regime each day was classified as, using only data available that day. Log scale.</p>
+        <div class="legend"><span><i class="sw line"></i>SPY</span><span><i class="sw r0"></i>Calm</span><span><i class="sw r1"></i>Normal</span><span><i class="sw r2"></i>Elevated</span><span><i class="sw r3"></i>Stressed</span></div>
+        <div class="chart" data-draw="regime-timeline" data-source="regime_history"></div>
+      </div>
+
+      <div class="card wide" id="card-ticker-today">
+        <h3>Each ticker today</h3>
+        <p class="note">Volatility forecast from gradient boosting (annualized, the best forecaster in the walk-forward test), where it ranks in that ticker's last 10 years, and what followed past days in today's regime. "Worst 10% of weeks" = the 5-day return that only 1 in 10 past weeks fell below. Episodes = separate stretches of the regime, closer to the real sample size than days.</p>
+        <div class="tablebox">
+          <table data-source="ticker_insights" data-row-key="ticker">
+            <thead><tr>
+              <th data-field="ticker">Ticker</th>
+              <th class="num" data-field="vol_forecast_5d">Vol forecast</th>
+              <th class="num" data-field="vol_pctile">Vol percentile</th>
+              <th class="num" data-field="fwd21_mean">Avg next 21 days</th>
+              <th class="num" data-field="p_up_21d">Up after 21 days</th>
+              <th class="num" data-field="p_drop5_21d">Fell over 5%</th>
+              <th class="num" data-field="q10_5d">Worst 10% of weeks</th>
+              <th class="num" data-field="regime_days_hist">Past days</th>
+              <th class="num" data-field="regime_episodes">Episodes</th>
+            </tr></thead>
+            <tbody data-draw="ticker-today"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="card-regime-stats">
+        <h3>What followed each regime</h3>
+        <div class="ctrl"><label for="tt-reg-ticker">Ticker</label><select id="tt-reg-ticker" data-draw="reg-ticker" data-source="ticker_insights" aria-label="Ticker"></select></div>
+        <div class="tablebox">
+          <table data-source="regime_stats" data-row-key="ticker,regime">
+            <thead><tr>
+              <th data-field="regime">Regime</th>
+              <th class="num" data-field="days">Days</th>
+              <th class="num" data-field="episodes">Episodes</th>
+              <th class="num" data-field="fwd21_mean">Avg next 21 days</th>
+              <th class="num" data-field="p_up_21d">Up</th>
+              <th class="num" data-field="p_drop5_21d">Fell over 5%</th>
+              <th class="num" data-field="fwd21_vol">Volatility</th>
+              <th class="num" data-field="q10_5d">Worst 10% of weeks</th>
+            </tr></thead>
+            <tbody data-draw="regime-stats"></tbody>
+          </table>
+        </div>
+        <p class="note">Today's regime is in bold. Out-of-sample labels only. Few episodes = rough numbers: overlapping 21-day windows are not independent.</p>
+      </div>
+
+      <div class="card" id="card-transitions">
+        <h3>Where the market went next</h3>
+        <p class="note">Chance of being in each regime 21 trading days later, given today's regime (rows). Read across a row.</p>
+        <div class="chart short" data-draw="transitions" data-source="regime_transitions"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="vol">
+    <h2>Volatility forecasting</h2>
+    <p class="sub-h">Can we predict how bumpy the next 5 days will be? Four forecasts, tested walk-forward on years they never saw. The risk map currently uses the plain EWMA. The placebo rows train on shuffled targets: their skill should vanish.</p>
+    <p class="note" data-vol-awaiting hidden>No volatility report yet.</p>
+    <div class="grid">
+      <div class="card wide" id="card-vol-metrics">
+        <h3>Forecast quality (out-of-sample)</h3>
+        <p class="note">R²: share of the ups and downs in next-week volatility the forecast explains (0 = no better than a flat guess). QLIKE: the standard volatility forecast loss, lower is better; it punishes under-estimating risk more.</p>
+        <div class="tablebox">
+          <table data-source="vol_metrics" data-row-key="mode,model">
+            <thead><tr>
+              <th data-field="mode">Run</th>
+              <th data-field="model">Forecast</th>
+              <th class="num" data-field="r2_year">R² (avg per year)</th>
+              <th class="num" data-field="r2">R² (pooled)</th>
+              <th class="num" data-field="qlike">QLIKE</th>
+              <th class="num" data-field="corr">Correlation</th>
+            </tr></thead>
+            <tbody data-draw="vol-metrics"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="card-vol-yearly">
+        <h3>R² by year</h3>
+        <p class="note">Does each forecast help every year, or only in some?</p>
+        <div class="legend"><span><i class="sw m0"></i>EWMA</span><span><i class="sw m1"></i>EWMA recalibrated</span><span><i class="sw m2"></i>HAR</span><span><i class="sw m3"></i>Gradient boosting</span></div>
+        <div class="chart short" data-draw="vol-yearly" data-source="vol_yearly"></div>
+      </div>
+
+      <div class="card" id="card-vol-strategy">
+        <h3>Does a better forecast help the risk map?</h3>
+        <p class="note">Vol-targeting position (aim: 10% yearly volatility) sized by each forecast, after costs. "Vol miss" = how far each year's actual volatility landed from the 10% target (lower is better).</p>
+        <div class="tablebox">
+          <table data-source="vol_strategy" data-row-key="model">
+            <thead><tr>
+              <th data-field="model">Forecast</th>
+              <th class="num" data-field="sharpe">Sharpe</th>
+              <th class="num" data-field="cagr">Yearly return</th>
+              <th class="num" data-field="max_drawdown">Worst drawdown</th>
+              <th class="num" data-field="vol_miss">Vol miss</th>
+              <th class="num" data-field="worst_month">Worst month</th>
+            </tr></thead>
+            <tbody data-draw="vol-strategy"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="backtest">
+    <h2>Direction model (TCN) backtest</h2>
+    <p class="sub-h">
       <span data-say="awaiting">Waiting for the first real-data backtest. Results appear here as soon as a run finishes.</span>
       <span data-say="edge" hidden>Latest backtest: the TCN beats the vol-scaled baseline after costs, and the bootstrap test says the edge looks real. Next proof: live paper trading.</span>
       <span data-say="inconclusive" hidden>Latest backtest: the TCN's edge over the vol-scaled baseline is inconclusive. Not enough evidence yet to call it real or luck.</span>
@@ -82,17 +231,8 @@
         <div class="big" data-draw="t-placebo" data-source="status" data-field="placebo_check" data-row="0">—</div>
         <div class="sub">Placebo AUC <b data-draw="t-pauc" data-source="status" data-field="placebo_auc" data-row="0">—</b> · should be ≈ 0.500</div>
       </div>
-      <div class="tile" id="tile-phase">
-        <div class="label">Phase 1 progress</div>
-        <div class="big"><span data-draw="t-done" data-source="phase1" data-field="done" data-row="0">—</span> / <span data-draw="t-total" data-source="phase1" data-field="total" data-row="0">—</span></div>
-        <div class="sub">Roadmap items done</div>
-      </div>
     </div>
-  </header>
-
-  <section id="backtest">
-    <h2>Backtest</h2>
-    <div class="grid">
+    <div class="grid" style="margin-top: var(--cds-gap-md)">
       <div class="card wide" id="card-equity">
         <h3>Growth of $1, after costs</h3>
         <p class="note">Each strategy traded every day of the test period, equal weight across tickers. Log scale, so equal slopes mean equal % gains.</p>
@@ -188,6 +328,13 @@
 
   <section id="roadmap">
     <h2>Roadmap</h2>
+    <div class="tiles" style="margin: 0 0 var(--cds-gap-md)">
+      <div class="tile" id="tile-phase">
+        <div class="label">Current phase</div>
+        <div class="big"><span data-draw="t-done" data-source="phase_now" data-field="done" data-row="0">—</span> / <span data-draw="t-total" data-source="phase_now" data-field="total" data-row="0">—</span></div>
+        <div class="sub"><span data-draw="t-phase" data-source="phase_now" data-field="phase" data-row="0">—</span> · items done</div>
+      </div>
+    </div>
     <div class="card">
       <p class="note">From ROADMAP.md in the repo. Each new feature has to beat the version without it, or it's dropped.</p>
       <div class="tablebox">
@@ -266,12 +413,13 @@
     fn: (predq) => predq.filter((r) => r.mode === 'real').map(({ mode, ...r }) => r),
   });
 
-  dash.calc('phase1', {
-    inputs: ['roadmap'], title: 'Phase 1 progress',
-    description: 'Roadmap items in Phase 1 that are checked off, out of all Phase 1 items.',
+  dash.calc('phase_now', {
+    inputs: ['roadmap'], title: 'Current phase progress',
+    description: 'Checked-off items in the roadmap phase marked (now), out of all its items.',
     fn: (roadmap) => {
-      const p1 = roadmap.filter((r) => String(r.phase).startsWith('Phase 1'));
-      return [{ done: p1.filter((r) => r.done === true || r.done === 'true').length, total: p1.length }];
+      const cur = roadmap.filter((r) => r.current === true || r.current === 'true');
+      const done = cur.filter((r) => r.done === true || r.done === 'true').length;
+      return [{ phase: cur.length ? String(cur[0].phase) : '', done, total: cur.length }];
     },
   });
 
@@ -287,6 +435,9 @@
     say('placebo-fail', !!s && s.placebo_check === 'Failed');
     say('period', !!s);
     for (const el of document.querySelectorAll('[data-awaiting]')) el.hidden = !!s || dash.data('status').status !== 'ok';
+    const ins = dash.data('insight_summary'), vm = dash.data('vol_metrics');
+    for (const el of document.querySelectorAll('[data-ins-awaiting]')) el.hidden = !(ins.status === 'ok' && !ins.data.length);
+    for (const el of document.querySelectorAll('[data-vol-awaiting]')) el.hidden = !(vm.status === 'ok' && !vm.data.length);
   });
 </script>
 
@@ -311,8 +462,8 @@
   tile('period', 'test_period', (v) => v.replace('->', '–'));
   tile('retrain', 'retrain', (v) => v.toLowerCase());
   tile('rundate', 'latest_run', (v) => d3.utcFormat('%b %-d, %Y')(new Date(v)));
-  for (const [name, field] of [['t-done', 'done'], ['t-total', 'total']]) {
-    dash.draw(name, (el) => { const p = tt.row('phase1'); el.textContent = p ? String(p[field]) : '—'; });
+  for (const [name, field] of [['t-done', 'done'], ['t-total', 'total'], ['t-phase', 'phase']]) {
+    dash.draw(name, (el) => { const p = tt.row('phase_now'); el.textContent = p && p.total ? String(p[field]) : '—'; });
   }
 </script>
 
@@ -528,5 +679,250 @@
       const st = document.createElement('td'); st.textContent = r.status; st.className = r.done ? 'done' : 'todo';
       tr.append(p, it, st); tb.appendChild(tr);
     }
+  });
+</script>
+
+<script>
+  // ---------- market insights: tiles ----------
+  window.ttr = {
+    NAMES: ['Calm', 'Normal', 'Elevated', 'Stressed'],
+    OPAC: [0.06, 0.16, 0.32, 0.55],
+    selTicker() { return dash.params().ticker || 'SPY'; },
+  };
+  const insTile = (name, field, fmt, cls) => dash.draw(name, (el) => {
+    const s = tt.row('insight_summary');
+    el.className = el.className.replace(/\breg-\w+/g, '').trim();
+    if (!s || s[field] == null) { el.textContent = '—'; return; }
+    el.textContent = fmt(s[field]);
+    if (cls) el.classList.add(cls(s));
+  });
+  insTile('ins-asof', 'as_of', (v) => d3.utcFormat('%b %-d, %Y')(new Date(v)));
+  insTile('ins-since', 'test_start', (v) => String(v).slice(0, 4));
+  insTile('ins-regime', 'regime', (v) => v, (s) => 'reg-' + s.regime);
+  insTile('ins-prob', 'regime_prob', tt.pct0);
+  insTile('ins-days', 'days_in_regime', (v) => d3.format(',')(v));
+  insTile('ins-stay', 'p_same_regime_21d', tt.pct0);
+  insTile('ins-run', 'avg_run_days', (v) => d3.format('.0f')(v));
+  const spyTile = (name, field, fmt) => dash.draw(name, (el) => {
+    const r = tt.rows('ticker_insights').find((x) => x.ticker === 'SPY');
+    el.textContent = r && r[field] != null ? fmt(r[field]) : '—';
+  });
+  spyTile('ins-vol', 'vol_forecast_5d', tt.pct);
+  spyTile('ins-volp', 'vol_pctile', tt.pct0);
+  spyTile('ins-fwd', 'fwd21_mean', d3.format('+.1%'));
+  spyTile('ins-up', 'p_up_21d', tt.pct0);
+  spyTile('ins-drop', 'p_drop5_21d', tt.pct0);
+
+  // ---------- each ticker today ----------
+  dash.draw('ticker-today', (tb) => {
+    tb.replaceChildren();
+    const fp = d3.format('+.1%');
+    const cols = [
+      { f: 'ticker' }, { f: 'vol_forecast_5d', fmt: tt.pct, num: true }, { f: 'vol_pctile', fmt: tt.pct0, num: true },
+      { f: 'fwd21_mean', fmt: fp, num: true }, { f: 'p_up_21d', fmt: tt.pct0, num: true },
+      { f: 'p_drop5_21d', fmt: tt.pct0, num: true }, { f: 'q10_5d', fmt: fp, num: true },
+      { f: 'regime_days_hist', fmt: d3.format(','), num: true }, { f: 'regime_episodes', fmt: d3.format(','), num: true },
+    ];
+    for (const r of tt.rows('ticker_insights')) {
+      const tr = document.createElement('tr'); tr.dataset.key = r.ticker;
+      for (const c of cols) {
+        const td = document.createElement('td'); const v = r[c.f];
+        td.textContent = v == null ? '—' : c.fmt ? c.fmt(v) : String(v);
+        if (c.num) td.classList.add('num');
+        tr.appendChild(td);
+      }
+      tb.appendChild(tr);
+    }
+  });
+
+  // ---------- ticker picker + what followed each regime ----------
+  dash.draw('reg-ticker', (sel) => {
+    const rows = tt.rows('ticker_insights');
+    sel.replaceChildren(...rows.map((r) => new Option(r.ticker, r.ticker)));
+    sel.value = ttr.selTicker();
+    sel.onchange = () => dash.setParams({ ticker: sel.value });
+  });
+  dash.draw('regime-stats', (tb) => {
+    tb.replaceChildren();
+    const t = ttr.selTicker();
+    const today = tt.row('insight_summary')?.regime;
+    const rows = tt.rows('regime_stats').filter((r) => r.ticker === t)
+      .sort((a, b) => ttr.NAMES.indexOf(a.regime) - ttr.NAMES.indexOf(b.regime));
+    const fp = d3.format('+.1%');
+    const cols = [
+      { f: 'regime' }, { f: 'days', fmt: d3.format(','), num: true }, { f: 'episodes', fmt: d3.format(','), num: true },
+      { f: 'fwd21_mean', fmt: fp, num: true },
+      { f: 'p_up_21d', fmt: tt.pct0, num: true }, { f: 'p_drop5_21d', fmt: tt.pct0, num: true },
+      { f: 'fwd21_vol', fmt: tt.pct0, num: true }, { f: 'q10_5d', fmt: fp, num: true },
+    ];
+    for (const r of rows) {
+      const tr = document.createElement('tr');
+      tr.dataset.key = `${encodeURIComponent(r.ticker)},${encodeURIComponent(r.regime)}`;
+      if (r.regime === today) tr.className = 'cur';
+      for (const c of cols) {
+        const td = document.createElement('td'); const v = r[c.f];
+        td.textContent = v == null ? '—' : c.fmt ? c.fmt(+v) : String(v);
+        if (c.num) td.classList.add('num');
+        if (c.f === 'regime') td.classList.add('reg-' + r.regime);
+        tr.appendChild(td);
+      }
+      tb.appendChild(tr);
+    }
+  });
+</script>
+
+<script>
+  // ---------- regime timeline: SPY price with regime shading ----------
+  dash.draw('regime-timeline', (el) => {
+    el.replaceChildren();
+    if (tt.failed(el, 'regime_history')) return;
+    const raw = tt.rows('regime_history');
+    if (!raw.length) return;
+    const parse = d3.utcParse('%Y-%m-%d');
+    const rows = raw.map((r) => ({ date: parse(r.date), regime: r.regime, close: +r.close }));
+    const W = el.clientWidth, H = 300, mb = 28;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'SPY price with market regime shading');
+    const y = d3.scaleLog(d3.extent(rows, (r) => r.close), [H - mb, 10]).nice();
+    const ticks = y.ticks(5).filter((t, i, a) => a.length <= 6 || i % 2 === 0);
+    const probe = svg.append('text').style('font-size', 'var(--cds-font-size-caption)');
+    const fmt = (v) => '$' + d3.format(',.0f')(v);
+    const ml = d3.max(ticks, (t) => { probe.text(fmt(t)); return probe.node().getComputedTextLength(); }) + 10;
+    probe.remove();
+    const x = d3.scaleUtc(d3.extent(rows, (r) => r.date), [ml, W - 8]);
+    // shading: one rect per run of identical regime
+    const runs = [];
+    for (let i = 0; i < rows.length; i++) {
+      const last = runs[runs.length - 1];
+      if (last && last.regime === rows[i].regime) last.end = rows[i].date;
+      else runs.push({ regime: rows[i].regime, start: rows[i].date, end: rows[i].date });
+    }
+    const crit = tt.css('--cds-chart-status-critical');
+    svg.append('g').selectAll('rect').data(runs).join('rect')
+      .attr('x', (d) => x(d.start)).attr('width', (d) => Math.max(1, x(d.end) - x(d.start) + 1))
+      .attr('y', 10).attr('height', H - mb - 10).attr('fill', crit)
+      .attr('fill-opacity', (d) => ttr.OPAC[ttr.NAMES.indexOf(d.regime)] ?? 0);
+    svg.append('g').selectAll('line').data(ticks).join('line').attr('x1', ml).attr('x2', W - 8).attr('y1', y).attr('y2', y).attr('stroke', tt.css('--cds-chart-grid'));
+    const gy = svg.append('g').attr('transform', `translate(${ml},0)`).call(d3.axisLeft(y).tickValues(ticks).tickFormat(fmt).tickSize(0).tickPadding(6));
+    gy.select('.domain').remove(); tt.axisStyle(gy);
+    const gx = svg.append('g').attr('transform', `translate(0,${H - mb})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - ml) / 90))).tickSizeOuter(0));
+    tt.axisStyle(gx);
+    svg.append('path').datum(rows).attr('fill', 'none').attr('stroke', tt.css('--color-fg')).attr('stroke-width', 1.5)
+      .attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round').attr('d', d3.line().x((d) => x(d.date)).y((d) => y(d.close)));
+    // hover
+    const tip = tt.tip(el);
+    const dates = rows.map((r) => +r.date);
+    const dot = svg.append('circle').attr('r', 4).attr('fill', tt.css('--color-fg')).attr('stroke', tt.css('--color-panel')).attr('stroke-width', 2).style('display', 'none');
+    svg.append('rect').attr('x', ml).attr('y', 0).attr('width', W - ml - 8).attr('height', H - mb).attr('fill', 'transparent')
+      .on('pointermove', (ev) => {
+        const [mx] = d3.pointer(ev);
+        const r = rows[Math.max(0, Math.min(rows.length - 1, d3.bisectCenter(dates, +x.invert(mx))))];
+        dot.style('display', null).attr('cx', x(r.date)).attr('cy', y(r.close));
+        tt.tipRows(tip, d3.utcFormat('%b %-d, %Y')(r.date), [
+          { name: 'SPY', color: tt.css('--color-fg'), value: '$' + d3.format(',.2f')(r.close) },
+          { name: 'Regime', color: 'transparent', value: r.regime },
+        ]);
+        tip.hidden = false; tt.placeTip(el, tip, x(r.date), y(r.close));
+      })
+      .on('pointerleave', () => { tip.hidden = true; dot.style('display', 'none'); });
+  });
+
+  // ---------- regime transitions heatmap ----------
+  dash.draw('transitions', (el) => {
+    el.replaceChildren();
+    if (tt.failed(el, 'regime_transitions')) return;
+    const rows = tt.rows('regime_transitions').map((r) => ({ ...r, prob: +r.prob }));
+    if (!rows.length) return;
+    const W = el.clientWidth, H = 260, N = ttr.NAMES;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Regime transition probabilities');
+    const probe = svg.append('text').style('font-size', 'var(--cds-font-size-caption)');
+    const ml = d3.max(N, (n) => { probe.text(n); return probe.node().getComputedTextLength(); }) + 12;
+    probe.remove();
+    const mt = 34;
+    const x = d3.scaleBand(N, [ml, W - 4]).padding(0.06), y = d3.scaleBand(N, [mt, H - 4]).padding(0.06);
+    const today = tt.row('insight_summary')?.regime;
+    const fg = tt.css('--color-fg'), muted = tt.css('--color-fg-muted'), base = dash.colors[0];
+    svg.append('text').attr('x', (ml + W) / 2).attr('y', 10).attr('text-anchor', 'middle').attr('dominant-baseline', 'hanging')
+      .style('font-size', 'var(--cds-font-size-caption)').attr('fill', muted).text('Regime 21 trading days later');
+    svg.append('g').selectAll('text').data(N).join('text').attr('x', (d) => x(d) + x.bandwidth() / 2).attr('y', mt - 6)
+      .attr('text-anchor', 'middle').style('font-size', 'var(--cds-font-size-caption)').attr('fill', muted).text((d) => d);
+    svg.append('g').selectAll('text').data(N).join('text').attr('x', ml - 8).attr('y', (d) => y(d) + y.bandwidth() / 2).attr('dy', '0.32em')
+      .attr('text-anchor', 'end').style('font-size', 'var(--cds-font-size-caption)')
+      .style('font-weight', (d) => (d === today ? 'var(--cds-font-weight-medium)' : null)).attr('fill', (d) => (d === today ? fg : muted)).text((d) => d);
+    const cells = svg.append('g').selectAll('g').data(rows).join('g');
+    cells.append('rect').attr('x', (d) => x(d.in_21d)).attr('y', (d) => y(d.today)).attr('width', x.bandwidth()).attr('height', y.bandwidth())
+      .attr('rx', 3).attr('fill', base).attr('fill-opacity', (d) => 0.08 + 0.85 * d.prob)
+      .attr('stroke', (d) => (d.today === today ? fg : 'none')).attr('stroke-width', 1);
+    cells.append('text').attr('x', (d) => x(d.in_21d) + x.bandwidth() / 2).attr('y', (d) => y(d.today) + y.bandwidth() / 2).attr('dy', '0.32em')
+      .attr('text-anchor', 'middle').style('font-size', 'var(--cds-font-size-caption)').style('font-variant-numeric', 'tabular-nums')
+      .attr('fill', (d) => (d.prob > 0.5 ? tt.css('--color-bg') : fg)).text((d) => tt.pct0(d.prob));
+  });
+</script>
+
+<script>
+  // ---------- volatility forecasting ----------
+  window.ttv = {
+    MODELS: ['EWMA (current risk map)', 'EWMA recalibrated', 'HAR', 'Gradient boosting'],
+    color(m) { return [tt.css('--cds-chart-muted'), dash.colors[2], dash.colors[0], dash.colors[1]][ttv.MODELS.indexOf(m)] ?? tt.css('--cds-chart-muted'); },
+  };
+  dash.draw('vol-metrics', (tb) => {
+    tb.replaceChildren();
+    const rows = tt.rows('vol_metrics').slice().sort((a, b) =>
+      (a.mode === b.mode ? 0 : a.mode === 'Real' ? -1 : 1) || ttv.MODELS.indexOf(a.model) - ttv.MODELS.indexOf(b.model));
+    const best = d3.min(rows.filter((r) => r.mode === 'Real'), (r) => +r.qlike);
+    const f3 = d3.format('.3f'), f4 = d3.format('.4f');
+    for (const r of rows) {
+      const tr = document.createElement('tr');
+      tr.dataset.key = `${encodeURIComponent(r.mode)},${encodeURIComponent(r.model)}`;
+      if (r.mode === 'Real' && +r.qlike === best) tr.className = 'hl';
+      const cells = [r.mode, r.model, f3(+r.r2_year), f3(+r.r2), f4(+r.qlike), f3(+r.corr)];
+      cells.forEach((v, i) => { const td = document.createElement('td'); td.textContent = v; if (i >= 2) td.classList.add('num'); if (i === 0 && r.mode !== 'Real') td.classList.add('todo'); tr.appendChild(td); });
+      tb.appendChild(tr);
+    }
+  });
+  dash.draw('vol-strategy', (tb) => {
+    tb.replaceChildren();
+    const rows = tt.rows('vol_strategy').slice().sort((a, b) => ttv.MODELS.indexOf(a.model) - ttv.MODELS.indexOf(b.model));
+    for (const r of rows) {
+      const tr = document.createElement('tr'); tr.dataset.key = r.model;
+      const cells = [r.model, tt.f2(+r.sharpe), tt.pct(+r.cagr), tt.pct(+r.max_drawdown), tt.pct(+r.vol_miss), tt.pct(+r.worst_month)];
+      cells.forEach((v, i) => { const td = document.createElement('td'); td.textContent = v; if (i >= 1) td.classList.add('num'); tr.appendChild(td); });
+      tb.appendChild(tr);
+    }
+  });
+  dash.draw('vol-yearly', (el) => {
+    el.replaceChildren();
+    if (tt.failed(el, 'vol_yearly')) return;
+    const rows = tt.rows('vol_yearly').map((r) => ({ ...r, r2: +r.r2 }));
+    if (!rows.length) return;
+    const years = Array.from(new Set(rows.map((r) => r.year))).sort();
+    const models = ttv.MODELS.filter((m) => rows.some((r) => r.model === m));
+    const W = el.clientWidth, H = 260;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Volatility forecast R squared by year');
+    const ext = d3.extent(rows, (r) => r.r2);
+    const y = d3.scaleLinear([Math.min(0, ext[0]), Math.max(0, ext[1])], [H - 26, 8]).nice();
+    const probe = svg.append('text').style('font-size', 'var(--cds-font-size-caption)');
+    const ml = d3.max(y.ticks(5), (t) => { probe.text(tt.f1(t)); return probe.node().getComputedTextLength(); }) + 10;
+    probe.remove();
+    const x0 = d3.scaleBand(years, [ml, W - 4]).paddingInner(0.25).paddingOuter(0.1);
+    const x1 = d3.scaleBand(models, [0, x0.bandwidth()]).padding(0.12);
+    svg.append('g').selectAll('line').data(y.ticks(5)).join('line').attr('x1', ml).attr('x2', W - 4).attr('y1', y).attr('y2', y).attr('stroke', tt.css('--cds-chart-grid'));
+    svg.append('line').attr('x1', ml).attr('x2', W - 4).attr('y1', y(0)).attr('y2', y(0)).attr('stroke', tt.css('--cds-chart-axis'));
+    const gy = svg.append('g').attr('transform', `translate(${ml},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(tt.f1).tickSize(0).tickPadding(6));
+    gy.select('.domain').remove(); tt.axisStyle(gy);
+    const every = Math.ceil(years.length / Math.max(1, Math.floor((W - ml) / 44)));
+    const gx = svg.append('g').attr('transform', `translate(0,${H - 26})`).call(d3.axisBottom(x0).tickValues(years.filter((_, i) => i % every === 0)).tickSize(0).tickPadding(8));
+    gx.select('.domain').remove(); tt.axisStyle(gx);
+    const bw = Math.min(x1.bandwidth(), 32);
+    const tip = tt.tip(el);
+    svg.append('g').selectAll('rect').data(rows).join('rect')
+      .attr('x', (d) => x0(d.year) + x1(d.model) + (x1.bandwidth() - bw) / 2).attr('width', bw)
+      .attr('y', (d) => y(Math.max(0, d.r2))).attr('height', (d) => Math.max(1, Math.abs(y(d.r2) - y(0))))
+      .attr('rx', Math.min(2, bw / 2)).attr('fill', (d) => ttv.color(d.model))
+      .on('pointerenter pointermove', (ev, d) => {
+        const all = rows.filter((r) => r.year === d.year).sort((a, b) => ttv.MODELS.indexOf(a.model) - ttv.MODELS.indexOf(b.model));
+        tt.tipRows(tip, d.year, all.map((r) => ({ name: r.model, color: ttv.color(r.model), value: d3.format('.3f')(r.r2) })));
+        tip.hidden = false; const [mx, my] = d3.pointer(ev, el); tt.placeTip(el, tip, mx, my);
+      })
+      .on('pointerleave', () => { tip.hidden = true; });
   });
 </script>

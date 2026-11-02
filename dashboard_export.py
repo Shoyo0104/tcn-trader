@@ -119,19 +119,74 @@ def calib_rows(r):
 
 
 def roadmap_rows(path="ROADMAP.md"):
-    rows, phase = [], None
+    rows, phase, current = [], None, False
     for line in open(path):
         h = re.match(r"## (Phase \d+) - (.+)", line)
         if h:
             phase = f"{h.group(1)}: {h.group(2).split('(')[0].strip()}"
+            current = "(now)" in h.group(2)
             continue
         if line.startswith("## "):
             phase = None
         c = re.match(r"- \[( |x)\] (.+)", line)
         if c and phase:
             rows.append({"order": len(rows) + 1, "phase": phase, "item": c.group(2).strip(),
-                         "done": c.group(1) == "x", "status": "Done" if c.group(1) == "x" else "To do"})
+                         "done": c.group(1) == "x", "status": "Done" if c.group(1) == "x" else "To do",
+                         "current": current})
     return rows
+
+
+def _latest_folder(kind):
+    """Newest reports/<date>-<HHMM>-<kind>/ folder (kind: vol, volplacebo, insights)."""
+    found = []
+    for f in glob.glob(f"reports/*-{kind}/"):
+        m = re.match(rf"(\d{{4}}-\d{{2}}-\d{{2}})-(\d{{4}})-{kind}$", os.path.basename(f.rstrip("/")))
+        if m:
+            found.append((m.group(1), m.group(2), f))
+    return sorted(found)[-1] if found else None
+
+
+def insight_exports():
+    out = {k: [] for k in ["vol_metrics", "vol_strategy", "vol_yearly", "insight_summary", "ticker_insights",
+                           "regime_stats", "regime_history", "regime_transitions", "regime_profile"]}
+    for kind, mode in [("vol", "Real"), ("volplacebo", "Placebo")]:
+        lf = _latest_folder(kind)
+        if not lf:
+            continue
+        date, hhmm, f = lf
+        met = pd.read_csv(os.path.join(f, "vol_metrics.csv"), index_col=0)
+        for m, r in met.iterrows():
+            out["vol_metrics"].append({"mode": mode, "model": m, "r2": _num(r["R2 (log vol)"]),
+                                       "r2_year": _num(r["R2 (avg per year)"]), "rmse": _num(r["RMSE (log vol)"]),
+                                       "qlike": _num(r["QLIKE"]), "corr": _num(r["Correlation"]),
+                                       "run": f"{date} {hhmm[:2]}:{hhmm[2:]}"})
+        if mode == "Real":
+            st = pd.read_csv(os.path.join(f, "vol_strategy.csv"), index_col=0)
+            for m, r in st.iterrows():
+                out["vol_strategy"].append({"model": m, "cagr": _num(r["CAGR"]), "volatility": _num(r["Volatility"]),
+                                            "sharpe": _num(r["Sharpe"]), "max_drawdown": _num(r["Max drawdown"]),
+                                            "vol_miss": _num(r["Yearly vol miss"]), "worst_month": _num(r["Worst month"])})
+            yr = pd.read_csv(os.path.join(f, "vol_yearly_r2.csv"), index_col=0)
+            for y, r in yr.iterrows():
+                for m in yr.columns:
+                    out["vol_yearly"].append({"year": str(y), "model": m, "r2": round(float(r[m]), 4)})
+    lf = _latest_folder("insights")
+    if lf:
+        date, hhmm, f = lf
+        ins = json.load(open(os.path.join(f, "insights.json")))
+        s = ins["summary"]
+        s["run"] = f"{date} {hhmm[:2]}:{hhmm[2:]}"
+        out["insight_summary"] = [s]
+        out["ticker_insights"] = ins["tickers"]
+        out["regime_stats"] = pd.read_csv(os.path.join(f, "regime_stats.csv")).to_dict("records")
+        h = pd.read_csv(os.path.join(f, "regime_history.csv"), parse_dates=["date"])
+        out["regime_history"] = [{"date": d.strftime("%Y-%m-%d"), "regime": g, "close": round(float(c), 3)}
+                                 for d, g, c in zip(h["date"], h["regime"], h["close"])]
+        tr = pd.read_csv(os.path.join(f, "regime_transitions.csv"), index_col=0)
+        out["regime_transitions"] = [{"today": a, "in_21d": b, "prob": round(float(tr.loc[a, b]), 4)}
+                                     for a in tr.index for b in tr.columns]
+        out["regime_profile"] = pd.read_csv(os.path.join(f, "regime_profile.csv")).to_dict("records")
+    return out
 
 
 def main():
@@ -192,6 +247,7 @@ def main():
     files = {"status": status, "runs": runs, "perf": perf, "predq": predq, "yearly": yearly,
              "equity": equity_rows(latest, cfg) if latest else [],
              "calibration": calib_rows(latest) if latest else [], "roadmap": road}
+    files.update(insight_exports())
     for k, v in files.items():
         with open(os.path.join(OUT, f"{k}.json"), "w") as f:
             json.dump(v, f, separators=(",", ":"))

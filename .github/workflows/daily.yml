@@ -1,0 +1,68 @@
+name: Daily after-close run
+
+# Every weekday after the US close (21:45 UTC = 4:45pm New York in winter, 5:45pm in summer):
+#   1. ledger.py           score yesterday's paper trades, log positions for the next session
+#                          (the live TCN retrains once at the start of each month)
+#   2. run.py insights     today's market regime, volatility forecasts, what history says
+#   3. dashboard_export.py refresh the dashboard's data files
+#   4. morning_brief.py    the brief Claude sends each morning
+# Everything is committed, so the git history is the audit trail: each position is on record
+# before the session it applies to.
+# Manual run: Actions tab -> "Daily after-close run" -> Run workflow.
+on:
+  schedule:
+    - cron: "45 21 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily
+  cancel-in-progress: false
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
+
+      - name: Ledger (score + decide)
+        run: |
+          set -o pipefail
+          python ledger.py 2>&1 | grep -v -E "Pandas4Warning|inplace|pandas.pydata.org" | tee ledger_run.log
+
+      - name: Market insights
+        run: |
+          set -o pipefail
+          python run.py insights --out reports/daily-insights 2>&1 | grep -v -E "Pandas4Warning|inplace|pandas.pydata.org" | tee insights_run.log
+          cp insights_run.log reports/daily-insights/run.log
+
+      - name: Dashboard data + morning brief
+        run: |
+          python dashboard_export.py
+          python morning_brief.py
+
+      - name: Commit
+        run: |
+          cp ledger_run.log ledger/last_run.log
+          git config user.name "tcn-trader-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add ledger models reports/daily-insights reports/morning_brief.md dashboard_data
+          git commit -m "Daily run $(date -u +%Y-%m-%d) [skip ci]" || { echo "Nothing new to commit"; exit 0; }
+          for i in 1 2 3 4 5 6; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep $((i * 10))
+          done
+          exit 1

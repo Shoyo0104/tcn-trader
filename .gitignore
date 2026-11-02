@@ -4,7 +4,5 @@ __pycache__/
 venv/
 data/
 results/
-models/
-*.pt
 .DS_Store
 .ipynb_checkpoints/

@@ -298,8 +298,52 @@
 
   <section id="paper">
     <h2>Live paper trading</h2>
-    <div class="card">
-      <p class="live">Not started yet. Once the daily job is built (Phase 1), every prediction is logged before the market opens, scored the next day, and tracked here against buy &amp; hold. This is the real test.</p>
+    <p class="sub-h">The real test. Every weekday after the close, positions for the next session are written down and committed to the repo, then scored after that session closes. Nothing here can be back-filled or edited. Fake money, real prices, same costs as the backtest.</p>
+    <p class="note" data-ledger-awaiting hidden>The first positions are logged; the first scores arrive after the next close.</p>
+    <div class="tiles">
+      <div class="tile" id="tile-ledger-days">
+        <div class="label">Sessions scored</div>
+        <div class="big" data-draw="lg-days" data-source="ledger_meta" data-field="days_scored" data-row="0">—</div>
+        <div class="sub">Since <b data-draw="lg-first" data-source="ledger_meta" data-field="first_scored" data-row="0">—</b> · go/no-go needs 3 months</div>
+      </div>
+      <div class="tile" id="tile-ledger-tcn">
+        <div class="label">TCN + risk map, total</div>
+        <div class="big" data-draw="lg-tcn" data-source="ledger_strategies" data-where="strategy=TCN%20%2B%20risk%20map" data-field="total_return">—</div>
+        <div class="sub">Live model <b data-draw="lg-model" data-source="ledger_meta" data-field="model_version" data-row="0">—</b></div>
+      </div>
+      <div class="tile" id="tile-ledger-vol">
+        <div class="label">Vol-scaled long, total</div>
+        <div class="big" data-draw="lg-vol" data-source="ledger_strategies" data-where="strategy=Vol-scaled%20long" data-field="total_return">—</div>
+        <div class="sub">The baseline to beat</div>
+      </div>
+      <div class="tile" id="tile-ledger-bh">
+        <div class="label">Buy &amp; hold, total</div>
+        <div class="big" data-draw="lg-bh" data-source="ledger_strategies" data-where="strategy=Buy%20%26%20hold" data-field="total_return">—</div>
+        <div class="sub">Fully invested, equal weight</div>
+      </div>
+    </div>
+    <div class="grid" style="margin-top: var(--cds-gap-md)">
+      <div class="card" id="card-ledger-equity">
+        <h3>Growth of $1, live</h3>
+        <p class="note">Scored sessions only, after costs.</p>
+        <div class="legend"><span><i class="sw s0"></i>TCN + risk map</span><span><i class="sw s2"></i>Vol-scaled long</span><span><i class="sw s3"></i>Buy &amp; hold</span></div>
+        <div class="chart short" data-draw="ledger-equity" data-source="ledger_equity"></div>
+      </div>
+      <div class="card" id="card-ledger-positions">
+        <h3>Positions for the next session</h3>
+        <p class="note">Decided from the <b data-draw="lg-dec" data-source="ledger_meta" data-field="latest_decision_date" data-row="0">—</b> close. Weight = share of that ticker's slice of capital invested. P(up) = the TCN's calibrated chance the next session closes higher.</p>
+        <div class="tablebox">
+          <table data-source="ledger_positions" data-row-key="ticker,strategy">
+            <thead><tr>
+              <th data-field="ticker">Ticker</th>
+              <th data-field="strategy">Strategy</th>
+              <th class="num" data-field="weight">Weight</th>
+              <th class="num" data-field="p_up">P(up)</th>
+            </tr></thead>
+            <tbody data-draw="ledger-positions"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -438,6 +482,9 @@
     const ins = dash.data('insight_summary'), vm = dash.data('vol_metrics');
     for (const el of document.querySelectorAll('[data-ins-awaiting]')) el.hidden = !(ins.status === 'ok' && !ins.data.length);
     for (const el of document.querySelectorAll('[data-vol-awaiting]')) el.hidden = !(vm.status === 'ok' && !vm.data.length);
+    const lm = dash.data('ledger_meta');
+    const scored = lm.status === 'ok' && lm.data.length ? +lm.data[0].days_scored : null;
+    for (const el of document.querySelectorAll('[data-ledger-awaiting]')) el.hidden = !(scored === 0);
   });
 </script>
 
@@ -922,6 +969,92 @@
         const all = rows.filter((r) => r.year === d.year).sort((a, b) => ttv.MODELS.indexOf(a.model) - ttv.MODELS.indexOf(b.model));
         tt.tipRows(tip, d.year, all.map((r) => ({ name: r.model, color: ttv.color(r.model), value: d3.format('.3f')(r.r2) })));
         tip.hidden = false; const [mx, my] = d3.pointer(ev, el); tt.placeTip(el, tip, mx, my);
+      })
+      .on('pointerleave', () => { tip.hidden = true; });
+  });
+</script>
+
+<script>
+  // ---------- live paper trading ----------
+  const lgMeta = (name, field, fmt) => dash.draw(name, (el) => {
+    const m = tt.row('ledger_meta');
+    el.textContent = m && m[field] != null && m[field] !== '' ? fmt(m[field]) : '—';
+  });
+  lgMeta('lg-days', 'days_scored', (v) => d3.format(',')(+v));
+  lgMeta('lg-first', 'first_scored', (v) => d3.utcFormat('%b %-d, %Y')(new Date(v)));
+  lgMeta('lg-model', 'model_version', (v) => String(v).replace('tcn-', 'trained to '));
+  lgMeta('lg-dec', 'latest_decision_date', (v) => d3.utcFormat('%b %-d, %Y')(new Date(v)));
+  const lgTot = (name, strat) => dash.draw(name, (el) => {
+    const r = tt.rows('ledger_strategies').find((x) => x.strategy === strat);
+    el.classList.remove('good', 'bad');
+    if (!r) { el.textContent = '—'; return; }
+    el.textContent = d3.format('+.2%')(+r.total_return);
+    el.classList.add(+r.total_return >= 0 ? 'good' : 'bad');
+  });
+  lgTot('lg-tcn', 'TCN + risk map'); lgTot('lg-vol', 'Vol-scaled long'); lgTot('lg-bh', 'Buy & hold');
+
+  dash.draw('ledger-positions', (tb) => {
+    tb.replaceChildren();
+    const order = ['TCN + risk map', 'Vol-scaled long', 'Buy & hold'];
+    const rows = tt.rows('ledger_positions').slice().sort((a, b) =>
+      a.ticker.localeCompare(b.ticker) || order.indexOf(a.strategy) - order.indexOf(b.strategy));
+    let prev = null;
+    for (const r of rows) {
+      const tr = document.createElement('tr');
+      tr.dataset.key = `${encodeURIComponent(r.ticker)},${encodeURIComponent(r.strategy)}`;
+      const cells = [r.ticker, r.strategy, tt.pct0(+r.weight), r.p_up == null || r.p_up === '' ? '—' : tt.pct(+r.p_up)];
+      cells.forEach((v, i) => {
+        const td = document.createElement('td'); td.textContent = v;
+        if (i >= 2) td.classList.add('num');
+        if (i === 0 && r.ticker === prev) td.className = 'repeat';
+        tr.appendChild(td);
+      });
+      prev = r.ticker;
+      tb.appendChild(tr);
+    }
+  });
+
+  dash.draw('ledger-equity', (el) => {
+    el.replaceChildren();
+    if (tt.failed(el, 'ledger_equity')) return;
+    const parse = d3.utcParse('%Y-%m-%d');
+    const rows = tt.rows('ledger_equity').map((r) => ({ date: parse(r.date), strategy: r.strategy, value: +r.value }));
+    if (!rows.length) return;
+    const W = el.clientWidth, H = 260, mb = 26;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Live paper trading growth of $1');
+    const ext = d3.extent(rows, (r) => r.value);
+    const y = d3.scaleLinear([Math.min(ext[0], 1), Math.max(ext[1], 1)], [H - mb, 10]).nice();
+    const fmt = (v) => '$' + d3.format('.3f')(v);
+    const probe = svg.append('text').style('font-size', 'var(--cds-font-size-caption)');
+    const ml = d3.max(y.ticks(5), (t) => { probe.text(fmt(t)); return probe.node().getComputedTextLength(); }) + 10;
+    probe.remove();
+    const dates = Array.from(new Set(rows.map((r) => +r.date))).sort((a, b) => a - b);
+    const x = dates.length > 1 ? d3.scaleUtc([new Date(dates[0]), new Date(dates[dates.length - 1])], [ml, W - 12])
+                               : d3.scaleUtc([new Date(dates[0] - 864e5), new Date(dates[0] + 864e5)], [ml, W - 12]);
+    svg.append('g').selectAll('line').data(y.ticks(5)).join('line').attr('x1', ml).attr('x2', W - 12).attr('y1', y).attr('y2', y).attr('stroke', tt.css('--cds-chart-grid'));
+    svg.append('line').attr('x1', ml).attr('x2', W - 12).attr('y1', y(1)).attr('y2', y(1)).attr('stroke', tt.css('--cds-chart-reference')).attr('stroke-dasharray', '4 3');
+    const gy = svg.append('g').attr('transform', `translate(${ml},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(fmt).tickSize(0).tickPadding(6));
+    gy.select('.domain').remove(); tt.axisStyle(gy);
+    const gx = svg.append('g').attr('transform', `translate(0,${H - mb})`).call(d3.axisBottom(x).ticks(Math.min(dates.length, Math.max(2, Math.floor((W - ml) / 80)))).tickFormat(d3.utcFormat('%b %-d')).tickSizeOuter(0));
+    tt.axisStyle(gx);
+    const col = (s) => (s === 'TCN + risk map' ? dash.colors[0] : s === 'Vol-scaled long' ? dash.colors[2] : tt.css('--cds-chart-muted'));
+    for (const s of ['Buy & hold', 'Vol-scaled long', 'TCN + risk map']) {
+      const pts = rows.filter((r) => r.strategy === s);
+      if (!pts.length) continue;
+      svg.append('path').datum(pts).attr('fill', 'none').attr('stroke', col(s)).attr('stroke-width', 2)
+        .attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round').attr('d', d3.line().x((d) => x(d.date)).y((d) => y(d.value)));
+      svg.append('g').selectAll('circle').data(pts).join('circle').attr('cx', (d) => x(d.date)).attr('cy', (d) => y(d.value))
+        .attr('r', 3.5).attr('fill', col(s)).attr('stroke', tt.css('--color-panel')).attr('stroke-width', 1.5);
+    }
+    const tip = tt.tip(el);
+    const byDate = d3.group(rows, (r) => +r.date);
+    svg.append('rect').attr('x', ml).attr('y', 0).attr('width', W - ml - 12).attr('height', H - mb).attr('fill', 'transparent')
+      .on('pointermove', (ev) => {
+        const [mx] = d3.pointer(ev);
+        const dd = dates[Math.max(0, Math.min(dates.length - 1, d3.bisectCenter(dates, +x.invert(mx))))];
+        const pts = byDate.get(dd) || [];
+        tt.tipRows(tip, d3.utcFormat('%b %-d, %Y')(new Date(dd)), pts.map((p) => ({ name: p.strategy, color: col(p.strategy), value: fmt(p.value) })));
+        tip.hidden = false; tt.placeTip(el, tip, x(new Date(dd)), y(pts[0]?.value ?? 1));
       })
       .on('pointerleave', () => { tip.hidden = true; });
   });

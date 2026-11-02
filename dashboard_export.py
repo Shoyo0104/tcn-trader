@@ -137,13 +137,36 @@ def roadmap_rows(path="ROADMAP.md"):
 
 
 def _latest_folder(kind):
-    """Newest reports/<date>-<HHMM>-<kind>/ folder (kind: vol, volplacebo, insights)."""
+    """Newest report folder of a kind (vol, volplacebo, insights): either a dated one,
+    reports/<date>-<HHMM>-<kind>/, or the daily job's reports/daily-<kind>/ (dated by its run time)."""
     found = []
     for f in glob.glob(f"reports/*-{kind}/"):
         m = re.match(rf"(\d{{4}}-\d{{2}}-\d{{2}})-(\d{{4}})-{kind}$", os.path.basename(f.rstrip("/")))
         if m:
             found.append((m.group(1), m.group(2), f))
+    daily = f"reports/daily-{kind}/"
+    if os.path.exists(os.path.join(daily, "summary.md")):
+        mm = re.search(r"\*\*run_utc:\*\* (\d{4}-\d{2}-\d{2}) (\d{2}):(\d{2})", open(os.path.join(daily, "summary.md")).read())
+        if mm:
+            found.append((mm.group(1), mm.group(2) + mm.group(3), daily))
     return sorted(found)[-1] if found else None
+
+
+def ledger_exports():
+    out = {"ledger_meta": [], "ledger_equity": [], "ledger_strategies": [], "ledger_positions": []}
+    sp = os.path.join("ledger", "summary.json")
+    if not os.path.exists(sp):
+        return out
+    s = json.load(open(sp))
+    out["ledger_meta"] = [{k: s.get(k) for k in ["updated_utc", "model_version", "model_trained_through",
+                                                 "latest_decision_date", "first_scored", "last_scored"]}]
+    out["ledger_meta"][0]["days_scored"] = max([x["days"] for x in s.get("strategies", [])] or [0])
+    out["ledger_strategies"] = s.get("strategies", [])
+    out["ledger_positions"] = [{**p, "decision_date": s.get("latest_decision_date")} for p in s.get("current_positions", [])]
+    ep = os.path.join("ledger", "equity.csv")
+    if os.path.exists(ep):
+        out["ledger_equity"] = pd.read_csv(ep).to_dict("records")
+    return out
 
 
 def insight_exports():
@@ -248,6 +271,7 @@ def main():
              "equity": equity_rows(latest, cfg) if latest else [],
              "calibration": calib_rows(latest) if latest else [], "roadmap": road}
     files.update(insight_exports())
+    files.update(ledger_exports())
     for k, v in files.items():
         with open(os.path.join(OUT, f"{k}.json"), "w") as f:
             json.dump(v, f, separators=(",", ":"))

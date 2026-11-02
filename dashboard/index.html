@@ -837,7 +837,7 @@
     const probe = svg.append('text').style('font-size', 'var(--cds-font-size-caption)');
     const ml = d3.max(N, (n) => { probe.text(n); return probe.node().getComputedTextLength(); }) + 12;
     probe.remove();
-    const mt = 34;
+    const mt = 46;
     const x = d3.scaleBand(N, [ml, W - 4]).padding(0.06), y = d3.scaleBand(N, [mt, H - 4]).padding(0.06);
     const today = tt.row('insight_summary')?.regime;
     const fg = tt.css('--color-fg'), muted = tt.css('--color-fg-muted'), base = dash.colors[0];

@@ -1,18 +1,24 @@
-name: Real-data backtest
+name: Real-data research runs
 
-# Runs the walk-forward backtest on real market data and commits the report to reports/.
-# Trigger: Actions tab -> "Real-data backtest" -> Run workflow,
-#          or push a commit whose message contains [backtest].
+# Runs research jobs on real market data and commits each report to reports/.
+#   Backtest suite: TCN walk-forward backtest + placebo        (commit message tag: [backtest])
+#   Insights suite: volatility forecasts + placebo + market insights   (tag: [insights])
+# Or: Actions tab -> "Real-data research runs" -> Run workflow, and pick the suite.
 on:
   workflow_dispatch:
     inputs:
+      suite:
+        description: "Which jobs to run"
+        default: "all"
+        type: choice
+        options: ["all", "backtest", "insights"]
       freq:
-        description: "Retrain frequency: Y (yearly, ~30 min) or M (monthly, hours - better on the laptop GPU)"
+        description: "TCN retrain frequency: Y (yearly) or M (monthly, hours - better on the laptop GPU)"
         default: "Y"
         type: choice
         options: ["Y", "M"]
       epochs:
-        description: "Max epochs per retrain"
+        description: "Max epochs per TCN retrain"
         default: "40"
   push:
     branches: [main]
@@ -21,52 +27,79 @@ permissions:
   contents: write
 
 concurrency:
-  group: backtest
+  group: research-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  backtest:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[backtest]')
+  run:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, '[backtest]') ||
+      contains(github.event.head_commit.message, '[insights]')
     runs-on: ubuntu-latest
     timeout-minutes: 340
     strategy:
       fail-fast: false
       matrix:
-        mode: [real, placebo]
+        mode: [real, placebo, vol, volplacebo, insights]
     steps:
+      - name: Decide whether this job is part of the requested suite
+        env:
+          SUITE_IN: ${{ github.event.inputs.suite }}
+          MSG: ${{ github.event.head_commit.message }}
+        run: |
+          if [ -n "$SUITE_IN" ]; then SUITE="$SUITE_IN"; else
+            SUITE=""
+            case "$MSG" in *"[backtest]"*) SUITE="backtest";; esac
+            case "$MSG" in *"[insights]"*) if [ "$SUITE" = "backtest" ]; then SUITE="all"; else SUITE="insights"; fi;; esac
+          fi
+          case "${{ matrix.mode }}" in real|placebo) GROUP=backtest;; *) GROUP=insights;; esac
+          if [ "$SUITE" = "all" ] || [ "$SUITE" = "$GROUP" ]; then echo "RUN=1" >> $GITHUB_ENV; else echo "RUN=0" >> $GITHUB_ENV; fi
+          echo "suite=$SUITE group=$GROUP"
+
       - uses: actions/checkout@v4
+        if: env.RUN == '1'
 
       - uses: actions/setup-python@v5
+        if: env.RUN == '1'
         with:
           python-version: "3.11"
           cache: pip
 
-      - name: Install (CPU PyTorch)
+      - name: Install
+        if: env.RUN == '1'
         run: |
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
 
-      - name: Run backtest
+      - name: Run
+        if: env.RUN == '1'
         env:
           FREQ: ${{ github.event.inputs.freq || 'Y' }}
           EPOCHS: ${{ github.event.inputs.epochs || '40' }}
         run: |
+          set -o pipefail
           STAMP=$(date -u +%Y-%m-%d-%H%M)
-          OUT="reports/${STAMP}-${FREQ}-${{ matrix.mode }}"
-          FLAGS="--freq $FREQ --epochs $EPOCHS --out $OUT"
-          if [ "${{ matrix.mode }}" = "placebo" ]; then FLAGS="$FLAGS --placebo"; fi
-          python run.py backtest $FLAGS 2>&1 | tee run.log
+          case "${{ matrix.mode }}" in
+            real)       OUT="reports/${STAMP}-${FREQ}-real";     CMD="backtest --freq $FREQ --epochs $EPOCHS"; GZ=predictions.csv ;;
+            placebo)    OUT="reports/${STAMP}-${FREQ}-placebo";  CMD="backtest --freq $FREQ --epochs $EPOCHS --placebo"; GZ=predictions.csv ;;
+            vol)        OUT="reports/${STAMP}-vol";              CMD="vol"; GZ=vol_predictions.csv ;;
+            volplacebo) OUT="reports/${STAMP}-volplacebo";       CMD="vol --placebo"; GZ=vol_predictions.csv ;;
+            insights)   OUT="reports/${STAMP}-insights";         CMD="insights"; GZ="" ;;
+          esac
+          python run.py $CMD --out "$OUT" 2>&1 | grep -v -E "Pandas4Warning|inplace|pandas.pydata.org|^\s+\S+(\.\S+)*\(.*inplace" | tee run.log
           cp run.log "$OUT/run.log"
-          rm -f "$OUT/predictions.csv.gz"; gzip -f "$OUT/predictions.csv"
+          if [ -n "$GZ" ]; then gzip -f "$OUT/$GZ"; fi
           echo "OUT=$OUT" >> $GITHUB_ENV
 
       - name: Commit report
+        if: env.RUN == '1'
         run: |
           git config user.name "tcn-trader-bot"
           git config user.email "actions@users.noreply.github.com"
           git add "$OUT"
-          git commit -m "Backtest report: $OUT [skip ci]"
-          for i in 1 2 3 4 5; do
+          git commit -m "Report: $OUT [skip ci]"
+          for i in 1 2 3 4 5 6; do
             git pull --rebase origin main && git push origin HEAD:main && exit 0
             sleep $((i * 10))
           done

@@ -38,6 +38,8 @@ All commands use real market data (Yahoo Finance, adjusted for splits and divide
 | `python run.py backtest --freq Y` | Same, but retrains yearly. About 12x faster; good for quick experiments. |
 | `python run.py backtest --placebo` | **Leakage check.** Trains on shuffled labels and tests on the real ones. A model that learned nothing real must show no edge. If it does, something is leaking. Run it after every significant change. |
 | `python run.py signal` | Trains on the latest 10 years and prints a suggested position for the next trading day. |
+| `python run.py vol` | **Insight engine.** Walk-forward test of next-5-day volatility forecasts: EWMA (what the risk map uses), recalibrated EWMA, HAR, gradient boosting. Includes a vol-targeting strategy test. `--placebo` shuffles training targets (skill must vanish). |
+| `python run.py insights` | **Insight engine.** Today's market regime (Calm / Normal / Elevated / Stressed, from SPY), volatility forecasts and their percentile, and what historically followed this regime for each ticker, with sample sizes. |
 
 Useful flags: `--tickers SPY QQQ XIU.TO`, `--epochs 15`, `--start-year 2020 --end-year 2022` (faster), `--refresh` (re-download data), `--out reports/my-run` (output folder).
 
@@ -45,7 +47,7 @@ A full monthly backtest retrains ~140 times. That's hours on a CPU but much fast
 
 ### Running in the cloud (GitHub Actions)
 
-The **Real-data backtest** workflow runs the backtest and the placebo check side by side on GitHub's servers and commits the reports to `reports/`. Start it from the repo's Actions tab ("Run workflow"), or push a commit with `[backtest]` in the message. Yearly mode takes about 30-60 minutes; monthly mode is better on the laptop GPU.
+The **Real-data research runs** workflow runs jobs on GitHub's servers and commits each report to `reports/`. Start it from the repo's Actions tab ("Run workflow", pick a suite), or push a commit with a tag in the message: `[backtest]` (TCN backtest + placebo) or `[insights]` (volatility forecasts + placebo + market insights). Yearly mode takes minutes; monthly mode is better on the laptop GPU.
 
 ## Files
 
@@ -57,6 +59,8 @@ The **Real-data backtest** workflow runs the backtest and the placebo check side
 | `model.py` | TCN, training with early stopping, Platt calibration, logistic baseline. |
 | `risk.py` | The deadbanded volatility-scaled risk map. |
 | `backtest.py` | Walk-forward loop, costs, metrics, bootstrap test, charts. |
+| `insights.py` | Insight engine: volatility forecasting (EWMA / HAR / boosting) and walk-forward market regimes. |
+| `dashboard_export.py` | Turns `reports/` and `ROADMAP.md` into the dashboard's data files. |
 | `run.py` | Command line. |
 
 ## How it avoids fooling you

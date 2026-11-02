@@ -14,7 +14,7 @@ The single source of truth for where this project is going. Update the checkboxe
 
 Why monthly, not daily: one extra day barely changes a 10-year training set, retraining adds training-randomness noise to positions (extra trades and fees), and a model that changes every day can't be evaluated. The model still *uses* new data daily; only its weights update monthly.
 
-## Phase 1 - Foundation (now)
+## Phase 1 - Foundation
 
 - [x] TCN + calibrated sigmoid head + deadbanded volatility-scaled risk map
 - [x] Walk-forward backtest with costs, baselines (buy & hold, vol-scaled long, logistic), bootstrap significance test
@@ -33,7 +33,23 @@ Why monthly, not daily: one extra day barely changes a 10-year training set, ret
 - [ ] GitHub Actions workflow for the daily job (inference only; model weights come from the latest monthly retrain)
 - [ ] Monthly retrain script for the laptop (scheduled), including calibration-drift check
 
-## Phase 2 - Calendar and macro features
+## Phase 2 - Insight engine (now)
+
+Goal: move from "guess tomorrow's direction" to "tell me non-obvious, evidence-backed things about the market." Every insight states how many past cases it rests on. Same rules: walk-forward, real data only, placebo where a model is fit.
+
+- [ ] Volatility forecasting: next-5-day realized vol from HAR (classic statistical model) and gradient boosting, vs. the EWMA estimate the risk map uses today; walk-forward, placebo, and a vol-targeting strategy test
+- [ ] Market regime detection: walk-forward Gaussian mixture on SPY's market state (volatility, trend, drawdown), 4 regimes, what historically followed each
+- [ ] Daily insight output: current regime, vol forecast + percentile, regime-conditional downside per ticker
+- [ ] Dashboard "Market insights" section
+- [ ] Plug the best vol forecast into the risk map if it beats EWMA out-of-sample
+- [ ] Range forecasts: quantile regression for 5-day return ranges (e.g. 10% chance of falling more than X)
+- [ ] Unusual-day detection: how unlike history today's cross-asset picture is, plus the most similar past days
+- [ ] Cross-asset signals: bonds (TLT), gold, US dollar, oil; flag when usual relationships break
+- [ ] Event studies: market behaviour around FOMC, CPI, jobs reports (later: earnings)
+- [ ] Explainability: which inputs the models lean on, and when
+- [ ] Experiment registry: log every experiment (including failures) so multiple testing can be accounted for (deflated Sharpe)
+
+## Phase 3 - Calendar and macro features
 
 Each addition must improve out-of-sample results vs. the version without it, or it's dropped.
 
@@ -42,19 +58,19 @@ Each addition must improve out-of-sample results vs. the version without it, or 
 - [ ] Market-wide context: SPY returns as a feature for every ticker
 - [ ] Ablation table: performance with / without each feature group
 
-## Phase 3 - Research layer
+## Phase 4 - Research layer
 
 - [ ] Weekly research note (Claude): earnings, news, trends for the tracked tickers
 - [ ] **"Claude analyst" paper portfolio**: weekly picks from the research note, logged before results, tracked separately
 - [ ] Dashboard comparing three tracks: model vs. Claude analyst vs. index
 - Rule: Claude's judgment can only be evaluated going forward. Claude already knows past market history, so any backtest of its research would be leakage.
 
-## Phase 4 - Optional: individual stocks
+## Phase 5 - Optional: individual stocks
 
 - [ ] Point-in-time fundamentals from SEC EDGAR (revenue, EPS, surprises), stored by **release date**, not fiscal period end
 - [ ] Earnings-date features and post-earnings drift
 - [ ] Mega-cap tech universe as a separate run (AAPL, MSFT, NVDA, AMD, AMZN, META, GOOGL, NFLX + 2015-era laggards INTC, IBM, CSCO, ORCL to limit hindsight bias), judged vs equal-weight buy & hold of the same basket; relative-ranking version
-- [ ] Only if Phases 1-3 show something real
+- [ ] Only if Phases 1-4 show something real
 
 ## Go / no-go for real money
 
@@ -79,3 +95,4 @@ All must be true before considering real positions (small size only):
 | 2026-11-02 | First real-data backtest (SPY, QQQ, XIU.TO; 2015-2026; yearly retrain): price-only TCN shows no edge (Sharpe 0.56 vs vol-scaled 0.84; per-year AUC ~0.50). Placebo passed. Baseline established; next work aims to beat it |
 | 2026-11-02 | Headline AUC is now the average within each retrain period (first run: 0.502 per period vs 0.481 pooled; pooling mixed between-period base-rate shifts into the number) |
 | 2026-11-02 | Added XEQT.TO to the universe (history from Aug 2019). Re-ran backtest + placebo so results stay comparable |
+| 2026-11-02 | New Phase 2 "Insight engine": refocus from next-day direction (no edge found) to evidence-backed insights; start with volatility forecasting + regime detection. Later phases renumbered 3-5 |

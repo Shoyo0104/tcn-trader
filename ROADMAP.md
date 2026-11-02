@@ -32,11 +32,11 @@ Why monthly, not daily: one extra day barely changes a 10-year training set, ret
 - [x] Report AUC averaged within each retrain period, not only pooled (pooling mixes period-level base-rate shifts)
 - [ ] Set up the gaming laptop (CUDA PyTorch), run the full monthly backtest
 - [ ] Decide the ticker list (5-10 liquid ETFs) - currently SPY, QQQ, XIU.TO, XEQT.TO
-- [ ] Save trained models with version + training-date metadata (`models/`)
+- [x] Save trained models with version + training-date metadata (`models/`)
 - [ ] Champion vs. challenger promotion logic
-- [ ] Daily job: data update -> prediction -> append to `ledger/predictions.csv` (prediction made before the open, timestamped)
-- [ ] Ledger scorer: fills in realized returns the next day, tracks paper P&L vs. buy & hold and vol-scaled long
-- [ ] GitHub Actions workflow for the daily job (inference only; model weights come from the latest monthly retrain)
+- [x] Daily job: data update -> prediction -> append to `ledger/positions.csv` (decided after the close, committed before the next open, timestamped)
+- [x] Ledger scorer: fills in realized returns the next day, tracks paper P&L vs. buy & hold and vol-scaled long
+- [x] GitHub Actions workflow for the daily job (weekdays 21:45 UTC; the live TCN retrains on its first run of each month, on CPU in the cloud for now)
 - [ ] Monthly retrain script for the laptop (scheduled), including calibration-drift check
 
 ## Phase 2 - Insight engine (now)
@@ -49,7 +49,8 @@ Goal: move from "guess tomorrow's direction" to "tell me non-obvious, evidence-b
 - [x] Dashboard "Market insights" and "Volatility forecasting" sections
 - [ ] Plug the best vol forecast into the risk map if it beats EWMA out-of-sample (not yet: EWMA still sizes best)
 - [ ] Calibrate the vol forecast's level for position sizing on validation data (current forecasts over-estimate the risk level)
-- [ ] Run insights daily (GitHub Actions schedule) so the dashboard's Market insights stay current
+- [x] Run insights daily (GitHub Actions schedule) so the dashboard's Market insights stay current
+- [x] Morning brief: Claude scheduled task each day at 5:47am Vancouver time refreshes the dashboard and sends a summary
 - [ ] Range forecasts: quantile regression for 5-day return ranges (e.g. 10% chance of falling more than X)
 - [ ] Unusual-day detection: how unlike history today's cross-asset picture is, plus the most similar past days
 - [ ] Cross-asset signals: bonds (TLT), gold, US dollar, oil; flag when usual relationships break
@@ -116,4 +117,5 @@ All must be true before considering real positions (small size only):
 | 2026-11-02 | Corrected vol run (after the fixes): R2 avg per year EWMA 0.14, recalibrated EWMA 0.20, HAR 0.28, boosting 0.27; placebo passed. But in the vol-targeting test raw EWMA still sizes best (Sharpe 0.85 vs ~0.78; yearly vol miss 1.3% vs ~2.8%): corrected forecasts over-estimate the risk level. Risk map keeps EWMA. Next: calibrate the forecast level for sizing on validation data |
 | 2026-11-02 | Headline vol forecast in daily insights = HAR: tied with boosting, simpler and more transparent. (An earlier note picked boosting on pre-fix results; superseded.) Both choices were made after seeing test results; the experiment registry will count them |
 | 2026-11-02 | Regime statistics report separate episodes, not just days: overlapping 21-day windows overstate the evidence |
+| 2026-11-02 | Live paper trading started: first positions (TCN + risk map, vol-scaled long, buy & hold) decided from the Oct 30 close and committed 2026-11-02 12:37 UTC, before the Nov 2 open. Live TCN currently outputs ~55.6% for every ticker (base rate), so it behaves like vol-scaled long |
 | 2026-11-02 | End goal set: a buy / sell timing tool for ETFs and individual stocks, driven by trend, regime, volatility and calendar evidence (new Phase 6), validated by live paper trading |

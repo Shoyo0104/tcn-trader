@@ -6,13 +6,13 @@
     "k": 3,
     "dropout": 0.2
   },
-  "cal_coef": 0.0516376756131649,
-  "cal_intercept": 0.21123801171779633,
-  "signal_scale": 0.02,
-  "trained_through": "2026-10-29",
-  "version": "tcn-2026-10-29",
-  "n_train": 7223,
+  "cal_coef": -0.861395537853241,
+  "cal_intercept": 0.39883849024772644,
+  "signal_scale": 0.04515137895941734,
+  "trained_through": "2026-10-30",
+  "version": "tcn-2026-10-30",
+  "n_train": 7227,
   "n_val": 2010,
-  "trained_at_utc": "2026-11-02 12:37:25",
-  "trained_for_month": "2026-10"
+  "trained_at_utc": "2026-11-03 03:06:04",
+  "trained_for_month": "2026-11"
 }

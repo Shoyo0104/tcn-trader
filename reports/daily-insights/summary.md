@@ -1,24 +1,24 @@
 # Market insights
 
-- **run_utc:** 2026-11-02 12:37
-- **commit:** f91be8e
-- **as_of:** 2026-10-30
+- **run_utc:** 2026-11-03 03:06
+- **commit:** cfa6e7d
+- **as_of:** 2026-11-02
 - **market:** SPY
-- **regime_test_period:** 2015-01-02 -> 2026-10-30
+- **regime_test_period:** 2015-01-02 -> 2026-11-02
 
 ## Today
 
-Market regime (SPY) as of 2026-10-30: **Calm** (confidence 55%, 2 trading days so far; stretches of this regime have lasted ~11 days on average).
+Market regime (SPY) as of 2026-11-02: **Normal** (confidence 56%, 8 trading days so far; stretches of this regime have lasted ~10 days on average).
 
-Historically, 57% of Calm days were still Calm 21 trading days later.
+Historically, 43% of Normal days were still Normal 21 trading days later.
 
-**SPY**: volatility forecast for the next 5 days 14% (higher than 61% of the last 10 years). In past Calm periods (957 days in 54 separate episodes since 2015), the next 21 days averaged +0.4%, were up 65% of the time, and fell more than 5% 5% of the time; the worst 10% of 5-day moves were below -1.5%.
+**SPY**: volatility forecast for the next 5 days 15% (higher than 68% of the last 10 years). In past Normal periods (1008 days in 67 separate episodes since 2015), the next 21 days averaged +0.8%, were up 67% of the time, and fell more than 5% 7% of the time; the worst 10% of 5-day moves were below -2.0%.
 
-**XIU.TO**: volatility forecast for the next 5 days 15% (higher than 83% of the last 10 years). In past Calm periods (935 days in 54 separate episodes since 2015), the next 21 days averaged +0.2%, were up 58% of the time, and fell more than 5% 3% of the time; the worst 10% of 5-day moves were below -1.5%.
+**XIU.TO**: volatility forecast for the next 5 days 14% (higher than 79% of the last 10 years). In past Normal periods (987 days in 67 separate episodes since 2015), the next 21 days averaged +1.0%, were up 67% of the time, and fell more than 5% 4% of the time; the worst 10% of 5-day moves were below -1.8%.
 
-**QQQ**: volatility forecast for the next 5 days 20% (higher than 66% of the last 10 years). In past Calm periods (957 days in 54 separate episodes since 2015), the next 21 days averaged +0.7%, were up 65% of the time, and fell more than 5% 9% of the time; the worst 10% of 5-day moves were below -2.6%.
+**QQQ**: volatility forecast for the next 5 days 24% (higher than 75% of the last 10 years). In past Normal periods (1008 days in 67 separate episodes since 2015), the next 21 days averaged +1.1%, were up 64% of the time, and fell more than 5% 11% of the time; the worst 10% of 5-day moves were below -2.7%.
 
-**XEQT.TO**: volatility forecast for the next 5 days 14% (higher than 71% of the last 10 years). In past Calm periods (381 days in 54 separate episodes since 2015), the next 21 days averaged +0.6%, were up 66% of the time, and fell more than 5% 2% of the time; the worst 10% of 5-day moves were below -1.3%.
+**XEQT.TO**: volatility forecast for the next 5 days 12% (higher than 66% of the last 10 years). In past Normal periods (607 days in 67 separate episodes since 2015), the next 21 days averaged +1.2%, were up 73% of the time, and fell more than 5% 3% of the time; the worst 10% of 5-day moves were below -1.4%.
 
 How much evidence: overlapping 21-day windows are not independent, so the episode count, not the day count, is closer to the real sample size. Treat regime statistics built on few episodes as rough.
 
@@ -26,8 +26,8 @@ How much evidence: overlapping 21-day windows are not independent, so the episod
 
 | | days | episodes | share | avg_run_days | fwd21_mean | fwd21_median | p_up_21d | p_drop5_21d | fwd21_vol | q10_5d | p_drop3_5d |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Calm | 957 | 54 | 32.2% | 11 | 0.4% | 1.0% | 64.5% | 4.9% | 11.2% | -1.5% | 2.4% |
-| Normal | 997 | 65 | 33.5% | 10 | 0.8% | 1.6% | 66.3% | 7.5% | 13.5% | -2.1% | 5.5% |
+| Calm | 947 | 55 | 31.8% | 11 | 0.4% | 1.0% | 64.1% | 5.0% | 11.3% | -1.5% | 2.4% |
+| Normal | 1008 | 67 | 33.9% | 10 | 0.8% | 1.6% | 66.6% | 7.4% | 13.5% | -2.0% | 5.5% |
 | Elevated | 648 | 35 | 21.8% | 13 | 2.4% | 3.0% | 79.8% | 6.8% | 16.3% | -2.7% | 7.9% |
 | Stressed | 373 | 9 | 12.5% | 37 | 2.0% | 2.9% | 64.6% | 15.0% | 24.2% | -3.8% | 14.7% |
 
@@ -35,16 +35,16 @@ How much evidence: overlapping 21-day windows are not independent, so the episod
 
 | | typical_vol | typical_3m_return | typical_drawdown |
 |---|---|---|---|
-| Calm | 9.4% | +6.4% | -0.4% |
-| Normal | 13.0% | +4.2% | -3.4% |
-| Elevated | 22.6% | -1.1% | -12.8% |
-| Stressed | 31.7% | -7.1% | -11.8% |
+| Calm | 9.3% | +6.6% | -0.4% |
+| Normal | 14.2% | +2.9% | -3.7% |
+| Elevated | 15.2% | +5.3% | -5.4% |
+| Stressed | 25.4% | -4.3% | -14.7% |
 
 ## Chance of being in each regime 21 trading days later
 
 | | Calm | Normal | Elevated | Stressed |
 |---|---|---|---|---|
-| Calm | 57% | 34% | 8% | 1% |
+| Calm | 55% | 35% | 8% | 1% |
 | Normal | 31% | 43% | 24% | 2% |
 | Elevated | 16% | 35% | 38% | 11% |
 | Stressed | 3% | 1% | 24% | 72% |

@@ -1,31 +1,16 @@
-  df.drop(
-  df.rename(columns={
-  df.drop(
-  df.rename(columns={
-  df.drop(
-  df.rename(columns={
-  df.drop(
-  df.rename(columns={
 Data:
   SPY      2005-01-03 -> 2026-11-02 (5493 days)
   QQQ      2005-01-03 -> 2026-11-02 (5493 days)
-  XIU.TO   2005-01-04 -> 2026-11-02 (5481 days)
-  XEQT.TO  2019-08-14 -> 2026-11-02 (1812 days)
-Training live TCN (no model, or new month) on data through 2026-11-02 ...
+  XIU.TO   2005-01-04 -> 2026-11-03 (5482 days)
+  XEQT.TO  2019-08-14 -> 2026-11-03 (1813 days)
 
-Scored 12 positions; logged 12 new positions (model retrained). Model: tcn-2026-10-30
-  TCN + risk map     1 days  total -0.13%
-  Vol-scaled long    1 days  total -0.13%
-  Buy & hold         1 days  total -0.35%
-  next day SPY      TCN + risk map   weight 0.81  p_up 0.547
-  next day SPY      Vol-scaled long  weight 0.81
-  next day SPY      Buy & hold       weight 1.00
-  next day QQQ      TCN + risk map   weight 0.39  p_up 0.544
-  next day QQQ      Vol-scaled long  weight 0.39
-  next day QQQ      Buy & hold       weight 1.00
-  next day XIU.TO   TCN + risk map   weight 0.83  p_up 0.561
-  next day XIU.TO   Vol-scaled long  weight 0.83
+Scored 6 positions; logged 6 new positions. Model: tcn-2026-10-30
+  TCN + risk map     2 days  total -0.63%
+  Vol-scaled long    2 days  total -0.63%
+  Buy & hold         2 days  total -0.94%
+  next day XIU.TO   TCN + risk map   weight 0.79  p_up 0.561
+  next day XIU.TO   Vol-scaled long  weight 0.79
   next day XIU.TO   Buy & hold       weight 1.00
-  next day XEQT.TO  TCN + risk map   weight 0.82  p_up 0.556
-  next day XEQT.TO  Vol-scaled long  weight 0.82
+  next day XEQT.TO  TCN + risk map   weight 0.86  p_up 0.555
+  next day XEQT.TO  Vol-scaled long  weight 0.86
   next day XEQT.TO  Buy & hold       weight 1.00

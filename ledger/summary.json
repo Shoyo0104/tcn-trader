@@ -1,47 +1,47 @@
 {
-  "updated_utc": "2026-11-06 01:49:43",
+  "updated_utc": "2026-11-07 01:14:55",
   "model_version": "tcn-2026-10-30",
   "model_trained_through": "2026-10-30",
   "strategies": [
     {
       "strategy": "TCN + risk map",
-      "days": 4,
-      "total_return": -0.008026103616203373,
+      "days": 5,
+      "total_return": -0.010796169525463473,
       "best_day": 0.012842358888817306,
-      "worst_day": -0.01807827041136461,
-      "hit_rate": 0.25
+      "worst_day": -0.023845777825705156,
+      "hit_rate": 0.4
     },
     {
       "strategy": "Vol-scaled long",
-      "days": 4,
-      "total_return": -0.008026103616203373,
+      "days": 5,
+      "total_return": -0.010796169525463473,
       "best_day": 0.012842358888817306,
-      "worst_day": -0.01807827041136461,
-      "hit_rate": 0.25
+      "worst_day": -0.023845777825705156,
+      "hit_rate": 0.4
     },
     {
       "strategy": "Buy & hold",
-      "days": 4,
-      "total_return": -0.014490699875317259,
+      "days": 5,
+      "total_return": -0.022330569495506825,
       "best_day": 0.016840194855793023,
-      "worst_day": -0.026741494170709035,
-      "hit_rate": 0.25
+      "worst_day": -0.04061596444393889,
+      "hit_rate": 0.4
     }
   ],
   "first_scored": "2026-11-02",
-  "last_scored": "2026-11-05",
-  "latest_decision_date": "2026-11-05",
+  "last_scored": "2026-11-06",
+  "latest_decision_date": "2026-11-06",
   "current_positions": [
     {
       "ticker": "XIU.TO",
       "strategy": "TCN + risk map",
-      "weight": 0.518584,
-      "p_up": 0.561004
+      "weight": 0.541353,
+      "p_up": 0.560789
     },
     {
       "ticker": "XIU.TO",
       "strategy": "Vol-scaled long",
-      "weight": 0.518584,
+      "weight": 0.541353,
       "p_up": null
     },
     {
@@ -53,13 +53,13 @@
     {
       "ticker": "XEQT.TO",
       "strategy": "TCN + risk map",
-      "weight": 0.485747,
-      "p_up": 0.554854
+      "weight": 0.500081,
+      "p_up": 0.555741
     },
     {
       "ticker": "XEQT.TO",
       "strategy": "Vol-scaled long",
-      "weight": 0.485747,
+      "weight": 0.500081,
       "p_up": null
     },
     {

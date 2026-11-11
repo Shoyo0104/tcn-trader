@@ -1,7 +1,7 @@
 # Market insights
 
-- **run_utc:** 2026-11-10 03:50
-- **commit:** f7bdb82
+- **run_utc:** 2026-11-11 01:29
+- **commit:** 91c448a
 - **as_of:** 2026-11-09
 - **market:** SPY
 - **regime_test_period:** 2015-01-02 -> 2026-11-09
@@ -14,11 +14,11 @@ Historically, 38% of Elevated days were still Elevated 21 trading days later.
 
 **SPY**: volatility forecast for the next 5 days 24% (higher than 90% of the last 10 years). In past Elevated periods (649 days in 35 separate episodes since 2015), the next 21 days averaged +2.4%, were up 80% of the time, and fell more than 5% 7% of the time; the worst 10% of 5-day moves were below -2.7%.
 
-**XIU.TO**: volatility forecast for the next 5 days 20% (higher than 92% of the last 10 years). In past Elevated periods (637 days in 35 separate episodes since 2015), the next 21 days averaged +1.9%, were up 73% of the time, and fell more than 5% 4% of the time; the worst 10% of 5-day moves were below -2.0%.
-
 **QQQ**: volatility forecast for the next 5 days 33% (higher than 90% of the last 10 years). In past Elevated periods (649 days in 35 separate episodes since 2015), the next 21 days averaged +3.2%, were up 78% of the time, and fell more than 5% 10% of the time; the worst 10% of 5-day moves were below -3.4%.
 
-**XEQT.TO**: volatility forecast for the next 5 days 20% (higher than 90% of the last 10 years). In past Elevated periods (424 days in 35 separate episodes since 2015), the next 21 days averaged +1.6%, were up 73% of the time, and fell more than 5% 7% of the time; the worst 10% of 5-day moves were below -2.1%.
+**XIU.TO**: volatility forecast for the next 5 days 17% (higher than 88% of the last 10 years). In past Elevated periods (637 days in 35 separate episodes since 2015), the next 21 days averaged +1.9%, were up 73% of the time, and fell more than 5% 4% of the time; the worst 10% of 5-day moves were below -2.0%.
+
+**XEQT.TO**: volatility forecast for the next 5 days 17% (higher than 83% of the last 10 years). In past Elevated periods (424 days in 35 separate episodes since 2015), the next 21 days averaged +1.6%, were up 73% of the time, and fell more than 5% 7% of the time; the worst 10% of 5-day moves were below -2.1%.
 
 How much evidence: overlapping 21-day windows are not independent, so the episode count, not the day count, is closer to the real sample size. Treat regime statistics built on few episodes as rough.
 

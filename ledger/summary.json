@@ -1,47 +1,47 @@
 {
-  "updated_utc": "2026-11-12 02:33:13",
+  "updated_utc": "2026-11-13 02:09:20",
   "model_version": "tcn-2026-10-30",
   "model_trained_through": "2026-10-30",
   "strategies": [
     {
       "strategy": "TCN + risk map",
-      "days": 8,
-      "total_return": 0.002384402762835691,
+      "days": 9,
+      "total_return": -0.00030170949178087714,
       "best_day": 0.012842358888817306,
       "worst_day": -0.023845777825705156,
-      "hit_rate": 0.5
+      "hit_rate": 0.4444444444444444
     },
     {
       "strategy": "Vol-scaled long",
-      "days": 8,
-      "total_return": 0.002384402762835691,
+      "days": 9,
+      "total_return": -0.00030170949178087714,
       "best_day": 0.012842358888817306,
       "worst_day": -0.023845777825705156,
-      "hit_rate": 0.5
+      "hit_rate": 0.4444444444444444
     },
     {
       "strategy": "Buy & hold",
-      "days": 8,
-      "total_return": 0.004050042664719866,
+      "days": 9,
+      "total_return": 0.002187416216458793,
       "best_day": 0.019592919261500086,
       "worst_day": -0.04061596444393889,
-      "hit_rate": 0.5
+      "hit_rate": 0.4444444444444444
     }
   ],
   "first_scored": "2026-11-02",
-  "last_scored": "2026-11-11",
-  "latest_decision_date": "2026-11-11",
+  "last_scored": "2026-11-12",
+  "latest_decision_date": "2026-11-12",
   "current_positions": [
     {
       "ticker": "XIU.TO",
       "strategy": "TCN + risk map",
-      "weight": 0.554613,
-      "p_up": 0.561325
+      "weight": 0.577359,
+      "p_up": 0.56085
     },
     {
       "ticker": "XIU.TO",
       "strategy": "Vol-scaled long",
-      "weight": 0.554613,
+      "weight": 0.577359,
       "p_up": null
     },
     {
@@ -53,13 +53,13 @@
     {
       "ticker": "XEQT.TO",
       "strategy": "TCN + risk map",
-      "weight": 0.475415,
-      "p_up": 0.557769
+      "weight": 0.494284,
+      "p_up": 0.559848
     },
     {
       "ticker": "XEQT.TO",
       "strategy": "Vol-scaled long",
-      "weight": 0.475415,
+      "weight": 0.494284,
       "p_up": null
     },
     {

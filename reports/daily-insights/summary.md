@@ -1,24 +1,24 @@
 # Market insights
 
-- **run_utc:** 2026-11-13 02:09
-- **commit:** 5f02436
-- **as_of:** 2026-11-11
+- **run_utc:** 2026-11-14 01:49
+- **commit:** ea03a72
+- **as_of:** 2026-11-13
 - **market:** SPY
-- **regime_test_period:** 2015-01-02 -> 2026-11-11
+- **regime_test_period:** 2015-01-02 -> 2026-11-13
 
 ## Today
 
-Market regime (SPY) as of 2026-11-11: **Elevated** (confidence 80%, 3 trading days so far; stretches of this regime have lasted ~13 days on average).
+Market regime (SPY) as of 2026-11-13: **Elevated** (confidence 90%, 5 trading days so far; stretches of this regime have lasted ~13 days on average).
 
-Historically, 38% of Elevated days were still Elevated 21 trading days later.
+Historically, 36% of Elevated days were still Elevated 21 trading days later.
 
-**SPY**: volatility forecast for the next 5 days 22% (higher than 85% of the last 10 years). In past Elevated periods (651 days in 35 separate episodes since 2015), the next 21 days averaged +2.4%, were up 80% of the time, and fell more than 5% 7% of the time; the worst 10% of 5-day moves were below -2.7%.
+**SPY**: volatility forecast for the next 5 days 20% (higher than 82% of the last 10 years). In past Elevated periods (643 days in 36 separate episodes since 2015), the next 21 days averaged +2.3%, were up 79% of the time, and fell more than 5% 7% of the time; the worst 10% of 5-day moves were below -2.9%.
 
-**QQQ**: volatility forecast for the next 5 days 31% (higher than 87% of the last 10 years). In past Elevated periods (651 days in 35 separate episodes since 2015), the next 21 days averaged +3.2%, were up 78% of the time, and fell more than 5% 10% of the time; the worst 10% of 5-day moves were below -3.4%.
+**XIU.TO**: volatility forecast for the next 5 days 13% (higher than 76% of the last 10 years). In past Elevated periods (633 days in 36 separate episodes since 2015), the next 21 days averaged +1.8%, were up 74% of the time, and fell more than 5% 4% of the time; the worst 10% of 5-day moves were below -2.2%.
 
-**XIU.TO**: volatility forecast for the next 5 days 15% (higher than 81% of the last 10 years). In past Elevated periods (639 days in 35 separate episodes since 2015), the next 21 days averaged +1.9%, were up 73% of the time, and fell more than 5% 4% of the time; the worst 10% of 5-day moves were below -2.0%.
+**QQQ**: volatility forecast for the next 5 days 30% (higher than 86% of the last 10 years). In past Elevated periods (643 days in 36 separate episodes since 2015), the next 21 days averaged +3.1%, were up 77% of the time, and fell more than 5% 10% of the time; the worst 10% of 5-day moves were below -3.6%.
 
-**XEQT.TO**: volatility forecast for the next 5 days 15% (higher than 76% of the last 10 years). In past Elevated periods (426 days in 35 separate episodes since 2015), the next 21 days averaged +1.6%, were up 73% of the time, and fell more than 5% 7% of the time; the worst 10% of 5-day moves were below -2.1%.
+**XEQT.TO**: volatility forecast for the next 5 days 15% (higher than 78% of the last 10 years). In past Elevated periods (420 days in 36 separate episodes since 2015), the next 21 days averaged +1.4%, were up 73% of the time, and fell more than 5% 7% of the time; the worst 10% of 5-day moves were below -2.3%.
 
 How much evidence: overlapping 21-day windows are not independent, so the episode count, not the day count, is closer to the real sample size. Treat regime statistics built on few episodes as rough.
 
@@ -26,10 +26,10 @@ How much evidence: overlapping 21-day windows are not independent, so the episod
 
 | | days | episodes | share | avg_run_days | fwd21_mean | fwd21_median | p_up_21d | p_drop5_21d | fwd21_vol | q10_5d | p_drop3_5d |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Calm | 948 | 55 | 31.8% | 11 | 0.4% | 0.9% | 63.8% | 5.1% | 11.3% | -1.5% | 2.4% |
-| Normal | 1011 | 66 | 33.9% | 10 | 0.8% | 1.5% | 66.4% | 7.4% | 13.5% | -2.1% | 5.6% |
-| Elevated | 651 | 35 | 21.8% | 13 | 2.4% | 3.0% | 79.8% | 6.8% | 16.3% | -2.7% | 7.9% |
-| Stressed | 373 | 9 | 12.5% | 37 | 2.0% | 2.9% | 64.6% | 15.0% | 24.2% | -3.8% | 14.7% |
+| Calm | 983 | 54 | 32.9% | 12 | 0.4% | 1.0% | 64.3% | 5.1% | 11.5% | -1.5% | 2.6% |
+| Normal | 1000 | 63 | 33.5% | 10 | 0.9% | 1.4% | 65.8% | 7.5% | 13.5% | -2.1% | 5.5% |
+| Elevated | 643 | 36 | 21.5% | 13 | 2.3% | 3.0% | 79.2% | 7.4% | 17.1% | -2.9% | 9.2% |
+| Stressed | 359 | 9 | 12.0% | 36 | 2.3% | 3.3% | 66.3% | 14.2% | 22.9% | -3.3% | 12.5% |
 
 ## Regime profiles (latest fit)
 
@@ -37,17 +37,17 @@ How much evidence: overlapping 21-day windows are not independent, so the episod
 |---|---|---|---|
 | Calm | 9.4% | +6.4% | -0.4% |
 | Normal | 11.8% | +4.9% | -2.9% |
-| Elevated | 20.4% | +1.2% | -7.8% |
-| Stressed | 29.3% | -6.3% | -16.0% |
+| Elevated | 20.4% | +1.2% | -7.7% |
+| Stressed | 29.2% | -6.3% | -16.0% |
 
 ## Chance of being in each regime 21 trading days later
 
 | | Calm | Normal | Elevated | Stressed |
 |---|---|---|---|---|
-| Calm | 55% | 35% | 8% | 1% |
-| Normal | 31% | 43% | 24% | 2% |
-| Elevated | 16% | 35% | 38% | 11% |
-| Stressed | 3% | 1% | 24% | 72% |
+| Calm | 56% | 34% | 9% | 2% |
+| Normal | 32% | 42% | 25% | 1% |
+| Elevated | 17% | 35% | 36% | 12% |
+| Stressed | 4% | 2% | 24% | 71% |
 
 ## Config
 

@@ -1,16 +1,22 @@
 Data:
-  SPY      2005-01-03 -> 2026-11-11 (5500 days)
-  QQQ      2005-01-03 -> 2026-11-11 (5500 days)
-  XIU.TO   2005-01-04 -> 2026-11-12 (5489 days)
-  XEQT.TO  2019-08-14 -> 2026-11-12 (1820 days)
+  SPY      2005-01-03 -> 2026-11-13 (5502 days)
+  QQQ      2005-01-03 -> 2026-11-13 (5502 days)
+  XIU.TO   2005-01-04 -> 2026-11-13 (5490 days)
+  XEQT.TO  2019-08-14 -> 2026-11-13 (1821 days)
 
 Scored 12 positions; logged 12 new positions. Model: tcn-2026-10-30
-  TCN + risk map     9 days  total -0.03%
-  Vol-scaled long    9 days  total -0.03%
-  Buy & hold         9 days  total +0.22%
-  next day XIU.TO   TCN + risk map   weight 0.58  p_up 0.561
-  next day XIU.TO   Vol-scaled long  weight 0.58
+  TCN + risk map    10 days  total +0.02%
+  Vol-scaled long   10 days  total +0.02%
+  Buy & hold        10 days  total +0.26%
+  next day SPY      TCN + risk map   weight 0.45  p_up 0.553
+  next day SPY      Vol-scaled long  weight 0.45
+  next day SPY      Buy & hold       weight 1.00
+  next day QQQ      TCN + risk map   weight 0.28  p_up 0.556
+  next day QQQ      Vol-scaled long  weight 0.28
+  next day QQQ      Buy & hold       weight 1.00
+  next day XIU.TO   TCN + risk map   weight 0.61  p_up 0.562
+  next day XIU.TO   Vol-scaled long  weight 0.61
   next day XIU.TO   Buy & hold       weight 1.00
-  next day XEQT.TO  TCN + risk map   weight 0.49  p_up 0.560
-  next day XEQT.TO  Vol-scaled long  weight 0.49
+  next day XEQT.TO  TCN + risk map   weight 0.52  p_up 0.562
+  next day XEQT.TO  Vol-scaled long  weight 0.52
   next day XEQT.TO  Buy & hold       weight 1.00

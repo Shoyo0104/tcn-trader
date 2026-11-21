@@ -1,1 +1,1 @@
-[{"as_of":"2026-11-19","market":"SPY","regime":"Elevated","regime_prob":0.9007022158367313,"days_in_regime":9,"avg_run_days":13.183673469387756,"p_same_regime_21d":0.35524256651017216,"test_start":"2015-01-02","regime_days_total":2989,"run":"2026-11-20 02:38"}]
+[{"as_of":"2026-11-20","market":"SPY","regime":"Elevated","regime_prob":0.9120917790803356,"days_in_regime":10,"avg_run_days":12.615384615384615,"p_same_regime_21d":0.3765432098765432,"test_start":"2015-01-02","regime_days_total":2990,"run":"2026-11-21 02:51"}]

@@ -1,47 +1,47 @@
 {
-  "updated_utc": "2026-11-21 02:51:21",
+  "updated_utc": "2026-11-24 05:32:55",
   "model_version": "tcn-2026-10-30",
   "model_trained_through": "2026-10-30",
   "strategies": [
     {
       "strategy": "TCN + risk map",
-      "days": 15,
-      "total_return": -0.03879573943492787,
-      "best_day": 0.012842358888817306,
+      "days": 16,
+      "total_return": -0.024209979435674267,
+      "best_day": 0.015174464572888003,
       "worst_day": -0.023845777825705156,
-      "hit_rate": 0.26666666666666666
+      "hit_rate": 0.3125
     },
     {
       "strategy": "Vol-scaled long",
-      "days": 15,
-      "total_return": -0.03879573943492787,
-      "best_day": 0.012842358888817306,
+      "days": 16,
+      "total_return": -0.024209979435674267,
+      "best_day": 0.015174464572888003,
       "worst_day": -0.023845777825705156,
-      "hit_rate": 0.26666666666666666
+      "hit_rate": 0.3125
     },
     {
       "strategy": "Buy & hold",
-      "days": 15,
-      "total_return": -0.08408916833201274,
-      "best_day": 0.019592919261500086,
+      "days": 16,
+      "total_return": -0.0426752405640386,
+      "best_day": 0.04521611311502266,
       "worst_day": -0.04061596444393889,
-      "hit_rate": 0.26666666666666666
+      "hit_rate": 0.3125
     }
   ],
   "first_scored": "2026-11-02",
-  "last_scored": "2026-11-20",
-  "latest_decision_date": "2026-11-20",
+  "last_scored": "2026-11-23",
+  "latest_decision_date": "2026-11-23",
   "current_positions": [
     {
       "ticker": "SPY",
       "strategy": "TCN + risk map",
-      "weight": 0.354599,
-      "p_up": 0.555414
+      "weight": 0.285409,
+      "p_up": 0.556349
     },
     {
       "ticker": "SPY",
       "strategy": "Vol-scaled long",
-      "weight": 0.354599,
+      "weight": 0.285409,
       "p_up": null
     },
     {
@@ -53,13 +53,13 @@
     {
       "ticker": "QQQ",
       "strategy": "TCN + risk map",
-      "weight": 0.235082,
-      "p_up": 0.556569
+      "weight": 0.191206,
+      "p_up": 0.557194
     },
     {
       "ticker": "QQQ",
       "strategy": "Vol-scaled long",
-      "weight": 0.235082,
+      "weight": 0.191206,
       "p_up": null
     },
     {
@@ -71,13 +71,13 @@
     {
       "ticker": "XIU.TO",
       "strategy": "TCN + risk map",
-      "weight": 0.463495,
-      "p_up": 0.563139
+      "weight": 0.417906,
+      "p_up": 0.563387
     },
     {
       "ticker": "XIU.TO",
       "strategy": "Vol-scaled long",
-      "weight": 0.463495,
+      "weight": 0.417906,
       "p_up": null
     },
     {
@@ -89,13 +89,13 @@
     {
       "ticker": "XEQT.TO",
       "strategy": "TCN + risk map",
-      "weight": 0.414629,
-      "p_up": 0.560353
+      "weight": 0.339743,
+      "p_up": 0.562038
     },
     {
       "ticker": "XEQT.TO",
       "strategy": "Vol-scaled long",
-      "weight": 0.414629,
+      "weight": 0.339743,
       "p_up": null
     },
     {

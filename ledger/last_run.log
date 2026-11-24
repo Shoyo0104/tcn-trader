@@ -1,22 +1,23 @@
+Crumb fetch rate-limited (HTTP 429), continuing without crumb
 Data:
-  SPY      2005-01-03 -> 2026-11-20 (5507 days)
-  QQQ      2005-01-03 -> 2026-11-20 (5507 days)
-  XIU.TO   2005-01-04 -> 2026-11-20 (5495 days)
-  XEQT.TO  2019-08-14 -> 2026-11-20 (1826 days)
+  SPY      2005-01-03 -> 2026-11-23 (5508 days)
+  QQQ      2005-01-03 -> 2026-11-23 (5508 days)
+  XIU.TO   2005-01-04 -> 2026-11-23 (5496 days)
+  XEQT.TO  2019-08-14 -> 2026-11-23 (1827 days)
 
 Scored 12 positions; logged 12 new positions. Model: tcn-2026-10-30
-  TCN + risk map    15 days  total -3.88%
-  Vol-scaled long   15 days  total -3.88%
-  Buy & hold        15 days  total -8.41%
-  next day SPY      TCN + risk map   weight 0.35  p_up 0.555
-  next day SPY      Vol-scaled long  weight 0.35
+  TCN + risk map    16 days  total -2.42%
+  Vol-scaled long   16 days  total -2.42%
+  Buy & hold        16 days  total -4.27%
+  next day SPY      TCN + risk map   weight 0.29  p_up 0.556
+  next day SPY      Vol-scaled long  weight 0.29
   next day SPY      Buy & hold       weight 1.00
-  next day QQQ      TCN + risk map   weight 0.24  p_up 0.557
-  next day QQQ      Vol-scaled long  weight 0.24
+  next day QQQ      TCN + risk map   weight 0.19  p_up 0.557
+  next day QQQ      Vol-scaled long  weight 0.19
   next day QQQ      Buy & hold       weight 1.00
-  next day XIU.TO   TCN + risk map   weight 0.46  p_up 0.563
-  next day XIU.TO   Vol-scaled long  weight 0.46
+  next day XIU.TO   TCN + risk map   weight 0.42  p_up 0.563
+  next day XIU.TO   Vol-scaled long  weight 0.42
   next day XIU.TO   Buy & hold       weight 1.00
-  next day XEQT.TO  TCN + risk map   weight 0.41  p_up 0.560
-  next day XEQT.TO  Vol-scaled long  weight 0.41
+  next day XEQT.TO  TCN + risk map   weight 0.34  p_up 0.562
+  next day XEQT.TO  Vol-scaled long  weight 0.34
   next day XEQT.TO  Buy & hold       weight 1.00

@@ -1,8 +1,8 @@
 Data:
-  SPY      2005-01-03 -> 2026-11-23 (5508 days)
-  QQQ      2005-01-03 -> 2026-11-23 (5508 days)
-  XIU.TO   2005-01-04 -> 2026-11-23 (5496 days)
-  XEQT.TO  2019-08-14 -> 2026-11-23 (1827 days)
+  SPY      2005-01-03 -> 2026-11-24 (5509 days)
+  QQQ      2005-01-03 -> 2026-11-24 (5509 days)
+  XIU.TO   2005-01-04 -> 2026-11-24 (5497 days)
+  XEQT.TO  2019-08-14 -> 2026-11-24 (1828 days)
 Market regimes from SPY (walk-forward, out-of-sample labels):
   2015: Calm 37%  Normal 50%  Elevated 13%  Stressed 0%
   2016: Calm 52%  Normal 35%  Elevated 13%  Stressed 0%
@@ -15,18 +15,18 @@ Market regimes from SPY (walk-forward, out-of-sample labels):
   2023: Calm 11%  Normal 26%  Elevated 37%  Stressed 26%
   2024: Calm 25%  Normal 46%  Elevated 29%  Stressed 0%
   2025: Calm 18%  Normal 34%  Elevated 29%  Stressed 19%
-  2026: Calm 27%  Normal 59%  Elevated 14%  Stressed 0%
+  2026: Calm 27%  Normal 58%  Elevated 15%  Stressed 0%
 
-Market regime (SPY) as of 2026-11-23: Elevated (confidence 94%, 11 trading days so far; stretches of this regime have lasted ~13 days on average).
+Market regime (SPY) as of 2026-11-24: Elevated (confidence 96%, 12 trading days so far; stretches of this regime have lasted ~13 days on average).
 
 Historically, 38% of Elevated days were still Elevated 21 trading days later.
 
-SPY: volatility forecast for the next 5 days 30% (higher than 94% of the last 10 years). In past Elevated periods (657 days in 36 separate episodes since 2015), the next 21 days averaged +2.4%, were up 80% of the time, and fell more than 5% 7% of the time; the worst 10% of 5-day moves were below -2.8%.
+SPY: volatility forecast for the next 5 days 27% (higher than 92% of the last 10 years). In past Elevated periods (658 days in 36 separate episodes since 2015), the next 21 days averaged +2.4%, were up 80% of the time, and fell more than 5% 7% of the time; the worst 10% of 5-day moves were below -2.8%.
 
-XIU.TO: volatility forecast for the next 5 days 19% (higher than 92% of the last 10 years). In past Elevated periods (645 days in 36 separate episodes since 2015), the next 21 days averaged +1.9%, were up 73% of the time, and fell more than 5% 4% of the time; the worst 10% of 5-day moves were below -2.1%.
+XIU.TO: volatility forecast for the next 5 days 20% (higher than 92% of the last 10 years). In past Elevated periods (646 days in 36 separate episodes since 2015), the next 21 days averaged +1.9%, were up 73% of the time, and fell more than 5% 4% of the time; the worst 10% of 5-day moves were below -2.1%.
 
-QQQ: volatility forecast for the next 5 days 39% (higher than 94% of the last 10 years). In past Elevated periods (657 days in 36 separate episodes since 2015), the next 21 days averaged +3.2%, were up 78% of the time, and fell more than 5% 10% of the time; the worst 10% of 5-day moves were below -3.5%.
+QQQ: volatility forecast for the next 5 days 40% (higher than 95% of the last 10 years). In past Elevated periods (658 days in 36 separate episodes since 2015), the next 21 days averaged +3.2%, were up 78% of the time, and fell more than 5% 10% of the time; the worst 10% of 5-day moves were below -3.5%.
 
-XEQT.TO: volatility forecast for the next 5 days 34% (higher than 98% of the last 10 years). In past Elevated periods (432 days in 36 separate episodes since 2015), the next 21 days averaged +1.6%, were up 73% of the time, and fell more than 5% 7% of the time; the worst 10% of 5-day moves were below -2.2%.
+XEQT.TO: volatility forecast for the next 5 days 25% (higher than 95% of the last 10 years). In past Elevated periods (433 days in 36 separate episodes since 2015), the next 21 days averaged +1.6%, were up 73% of the time, and fell more than 5% 7% of the time; the worst 10% of 5-day moves were below -2.2%.
 
 Saved insights to ./reports/daily-insights/
